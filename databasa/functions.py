@@ -7,11 +7,9 @@ from config import sql, db
 async def CreateBasa():
     sql.execute("""CREATE TABLE IF NOT EXISTS public.accounts
 (
-    id bigint NOT NULL,
+    id SERIAL NOT NULL,
     user_id bigint NOT NULL,
-    user_name character varying(32),
-    first_name character varying(64),
-    last_name character varying(64),
+    username character varying(32),
     lang_code character varying(10),
     CONSTRAINT accounts_pkey PRIMARY KEY (id)
 )""")
@@ -19,7 +17,7 @@ async def CreateBasa():
 
     sql.execute("""CREATE TABLE IF NOT EXISTS public.channels
 (
-    id bigint NOT NULL,
+    id SERIAL NOT NULL,
     chat_id bigint NOT NULL,
     title character varying,
     username character varying,
@@ -30,7 +28,7 @@ async def CreateBasa():
 
     sql.execute("""CREATE TABLE IF NOT EXISTS public.groups
 (
-    id bigint NOT NULL,
+    id SERIAL NOT NULL,
     chat_id bigint NOT NULL,
     title character varying,
     username character varying,
@@ -41,8 +39,8 @@ async def CreateBasa():
 
     sql.execute("""CREATE TABLE IF NOT EXISTS public.mandatorys
 (
-    id bigint NOT NULL,
-    chat_id bigint NOT NULL,
+    id SERIAL NOT NULL,
+    chat_id character varying NOT NULL,
     CONSTRAINT mandatorys_pkey PRIMARY KEY (id)
 )""")
     db.commit()
@@ -149,11 +147,13 @@ ALTER FUNCTION public.user_tts()
 
 async def Auth_Function(message):
     user_id = message.from_user.id
+    username = message.from_user.username
+    lang_code = message.from_user.language_code
 
-    check = sql.execute(f"""SELECT user_id FROM accounts WHERE user_id = {user_id}""").fetchone()
-
+    sql.execute(f"""SELECT user_id FROM accounts WHERE user_id = {user_id}""")
+    check = sql.fetchone()
     if check == None:
         sana = datetime.datetime.now(pytz.timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')
         sql.execute(
-            f"""INSERT INTO accounts (user_id, date, lang) VALUES ('{user_id}', '{sana}', '{message.from_user.language_code}')""")
+            f"""INSERT INTO accounts (user_id, username, lang_code) VALUES ('{user_id}', '{username}', '{lang_code}')""")
         db.commit()

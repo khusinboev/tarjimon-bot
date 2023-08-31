@@ -1,6 +1,7 @@
 from aiogram import types
-from aiogram.types import CallbackQuery, InlineKeyboardButton
+from aiogram.types import CallbackQuery
 
+from buttons.mButtons import JoinBtn
 from config import sql, dp
 from databasa.functions import Auth_Function
 from function.functions import functions
@@ -9,24 +10,14 @@ from function.functions import functions
 @dp.message_handler(commands='start')
 async def welcome(message: types.Message):
     user_id = message.chat.id
-
+    sql.execute(f"""SELECT user_id FROM public.accounts WHERE user_id = {user_id}""")
     await Auth_Function(message)
 
-    sql.execute("SELECT id FROM channels")
-    rows = sql.fetchall()
-    join_inline = types.InlineKeyboardMarkup(row_width=1)
-    title = 1
-    for row in rows:
-        all_details = await dp.bot.get_chat(chat_id=row[0])
-        url = all_details['invite_link']
-        join_inline.insert(InlineKeyboardButton(f"{title} - kanal", url=url))
-        title += 1
-    join_inline.add(InlineKeyboardButton("✅Obuna bo'ldim", callback_data="check"))
     if await functions.check_on_start(message.from_user.id):
         await message.answer(f"""Assalomu alaykum! """)
     else:
         await message.answer("Botimizdan foydalanish uchun kanalimizga azo bo'ling",
-                             reply_markup=join_inline)
+                             reply_markup=await JoinBtn(user_id))
 
 
 @dp.callback_query_handler(text="check")

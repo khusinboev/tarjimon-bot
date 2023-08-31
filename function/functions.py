@@ -6,7 +6,8 @@ from config import dp, sql, db
 class functions:
     @staticmethod
     async def check_on_start(user_id):
-        rows = sql.execute("SELECT id FROM channels").fetchall()
+        sql.execute("SELECT chat_id FROM public.mandatorys")
+        rows = sql.fetchall()
         error_code = 0
         for row in rows:
             r = await dp.bot.get_chat_member(chat_id=row[0], user_id=user_id)
@@ -22,29 +23,27 @@ class functions:
 
 class panel_func:
     @staticmethod
-    async def channel_add(id):
-        sql.execute("""CREATE TABLE IF NOT EXISTS channels(id)""")
-        db.commit()
-        sql.execute("INSERT INTO channels VALUES(?);", id)
+    async def channel_add(chat_id):
+        sql.execute(f"INSERT INTO public.mandatorys( chat_id ) VALUES('{chat_id}');")
         db.commit()
 
     @staticmethod
     async def channel_delete(id):
-        sql.execute(f'DELETE FROM channels WHERE id = "{id}"')
+        sql.execute(f'''DELETE FROM public.mandatorys WHERE chat_id = '{id}' ''')
         db.commit()
 
     @staticmethod
     async def channel_list():
-        sql.execute("SELECT id from channels")
+        sql.execute("SELECT chat_id from public.mandatorys")
         str = ''
         for row in sql.fetchall():
-            id = row[0]
+            chat_id = row[0]
             try:
-                all_details = await dp.bot.get_chat(chat_id=id)
+                all_details = await dp.bot.get_chat(chat_id=chat_id)
                 title = all_details["title"]
                 channel_id = all_details["id"]
                 info = all_details["description"]
-                str += f"------------------------------------------------\nKanal useri: > {id}\nKamal nomi: > {title}\nKanal id si: > {channel_id}\nKanal haqida: > {info}\n"
+                str += f"------------------------------------------------\nKanal useri: > {chat_id}\nKamal nomi: > {title}\nKanal id si: > {channel_id}\nKanal haqida: > {info}\n"
             except:
                 str += "Kanalni admin qiling"
         return str
