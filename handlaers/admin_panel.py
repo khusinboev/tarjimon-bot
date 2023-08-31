@@ -6,7 +6,7 @@ from aiogram.utils.exceptions import BotBlocked, ChatNotFound, RetryAfter, UserD
 
 from Statess.statess import From
 from buttons.mButtons import channel_btn, main_btn, reklama_btn
-from config import dp, sql, db
+from config import dp, sql, db, adminStart
 from function.functions import panel_func, forward_send_msg, send_message_chats
 
 
@@ -15,26 +15,25 @@ async def coder(msg: types.Message):
     await msg.reply("Bot dasturchisi @coder_admin_py\n\nPowered by @coder_admin_py", parse_mode='html')
 
 
-Admin = [5246872049, 1918760732]
 markup = ReplyKeyboardMarkup(resize_keyboard=True)
 markup.add("🔙Orqaga qaytish")
 
 
-@dp.message_handler(commands=['admin', 'panel'], user_id=Admin)
+@dp.message_handler(commands=['admin', 'panel'], user_id=adminStart)
 async def new(msg: types.Message):
     await msg.answer("Assalomu alaykum admin janoblari", reply_markup=main_btn)
 
 
 # await From.teststate.set()   state=From.teststate,
 
-@dp.message_handler(text="🔙Orqaga qaytish", user_id=Admin)
+@dp.message_handler(text="🔙Orqaga qaytish", user_id=adminStart)
 async def backs(message: types.Message):
     await message.reply("Bosh menyu", reply_markup=main_btn)
 
 
 ############################          STATISTIKA            """"""""""""""""""""""
 
-@dp.message_handler(text="📊Statistika", user_id=Admin)
+@dp.message_handler(text="📊Statistika", user_id=adminStart)
 async def new(msg: types.Message):
     sql.execute("SELECT COUNT(*) FROM users")
     followersall = sql.fetchone()[0]
@@ -44,12 +43,12 @@ async def new(msg: types.Message):
 
 ###########################           KANALLAR              """""""""""""""""""""
 
-@dp.message_handler(text='🔧Kanallar', user_id=Admin)
+@dp.message_handler(text='🔧Kanallar', user_id=adminStart)
 async def new(msg: types.Message):
     await msg.answer("Tanlang", reply_markup=channel_btn)
 
 
-@dp.message_handler(text="➕Kanal qo'shish", user_id=Admin)
+@dp.message_handler(text="➕Kanal qo'shish", user_id=adminStart)
 async def channel_add(message: types.Message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add("🔙Orqaga qaytish")
@@ -58,7 +57,7 @@ async def channel_add(message: types.Message):
     await From.channelAdd.set()
 
 
-@dp.message_handler(state=From.channelAdd, user_id=Admin)
+@dp.message_handler(state=From.channelAdd, user_id=adminStart)
 async def channelAdd1(message: types.Message, state: FSMContext):
     channel_id = [message.text.upper()]
     data = sql.execute(f"SELECT id FROM channels WHERE id = '{message.text.upper()}'").fetchone()
@@ -75,13 +74,13 @@ async def channelAdd1(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.message_handler(text="❌Kanalni olib tashlash", user_id=Admin)
+@dp.message_handler(text="❌Kanalni olib tashlash", user_id=adminStart)
 async def channelD(message: types.Message):
     await message.reply("O'chiriladigan kanalning userini yuboring.\nMisol uchun @coder_admin", reply_markup=markup)
     await From.channelDelete.set()
 
 
-@dp.message_handler(state=From.channelDelete, user_id=Admin)
+@dp.message_handler(state=From.channelDelete, user_id=adminStart)
 async def ChannelDel(message: types.Message, state: FSMContext):
     channel_id = message.text.upper()
     data = sql.execute(f"""SELECT id FROM channels WHERE id = '{channel_id}'""").fetchone()
@@ -109,12 +108,12 @@ async def channelList(message: types.Message):
 
 ################################            REKLAMA          """"""""""""""""""""""
 
-@dp.message_handler(text="📤Reklama", user_id=Admin)
+@dp.message_handler(text="📤Reklama", user_id=adminStart)
 async def all_send(message: types.Message):
     await message.reply("Foydalanuvchilarga xabar yuborish bo'limi", reply_markup=reklama_btn)
 
 
-@dp.message_handler(lambda message: message.text == "📨Forward xabar yuborish", user_id=Admin)
+@dp.message_handler(lambda message: message.text == "📨Forward xabar yuborish", user_id=adminStart)
 async def all_users(message: types.Message, state: FSMContext):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add("🔙Orqaga qaytish")
@@ -122,13 +121,13 @@ async def all_users(message: types.Message, state: FSMContext):
     await From.forward_msg.set()
 
 
-@dp.message_handler(state=From.forward_msg, text="🔙Orqaga qaytish", content_types=ContentType.ANY, user_id=Admin)
+@dp.message_handler(state=From.forward_msg, text="🔙Orqaga qaytish", content_types=ContentType.ANY, user_id=adminStart)
 async def all_users2(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply("Orqaga qaytildi", reply_markup=main_btn)
 
 
-@dp.message_handler(state=From.forward_msg, content_types=ContentType.ANY, user_id=Admin)
+@dp.message_handler(state=From.forward_msg, content_types=ContentType.ANY, user_id=adminStart)
 async def all_users2(message: types.Message, state: FSMContext):
     await state.finish()
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -141,7 +140,7 @@ async def all_users2(message: types.Message, state: FSMContext):
     await message.answer("Xabar yuborish yakunlandi", reply_markup=reklama_btn)
 
 
-@dp.message_handler(lambda message: message.text == "📬Oddiy xabar yuborish", user_id=Admin)
+@dp.message_handler(lambda message: message.text == "📬Oddiy xabar yuborish", user_id=adminStart)
 async def all_users(message: types.Message, state: FSMContext):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add("🔙Orqaga qaytish")
@@ -149,13 +148,13 @@ async def all_users(message: types.Message, state: FSMContext):
     await From.send_msg.set()
 
 
-@dp.message_handler(state=From.send_msg, text="🔙Orqaga qaytish", content_types=ContentType.ANY, user_id=Admin)
+@dp.message_handler(state=From.send_msg, text="🔙Orqaga qaytish", content_types=ContentType.ANY, user_id=adminStart)
 async def all_users2(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply("Orqaga qaytildi", reply_markup=main_btn)
 
 
-@dp.message_handler(state=From.send_msg, content_types=ContentType.ANY, user_id=Admin)
+@dp.message_handler(state=From.send_msg, content_types=ContentType.ANY, user_id=adminStart)
 async def all_users2(message: types.Message, state: FSMContext):
     await state.finish()
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -170,19 +169,19 @@ async def all_users2(message: types.Message, state: FSMContext):
 
 ################################              Tozalash           """"""""""""""""""""""
 
-@dp.message_handler(text="♻️ Tozalash", user_id=Admin)
+@dp.message_handler(text="♻️ Tozalash", user_id=adminStart)
 async def clear(message: types.Message):
     await message.reply("Tozalash kodini kiriting: ", reply_markup=markup)
     await From.clear_msg.set()
 
 
-@dp.message_handler(state=From.clear_msg, text="🔙Orqaga qaytish", content_types=ContentType.ANY, user_id=Admin)
+@dp.message_handler(state=From.clear_msg, text="🔙Orqaga qaytish", content_types=ContentType.ANY, user_id=adminStart)
 async def all_users2(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply("Orqaga qaytildi", reply_markup=main_btn)
 
 
-@dp.message_handler(state=From.clear_msg, user_id=Admin)
+@dp.message_handler(state=From.clear_msg, user_id=adminStart)
 async def clear1(message: types.Message, state: FSMContext):
     if message.text == '0000':
         sql.execute("SELECT COUNT(*) FROM users")

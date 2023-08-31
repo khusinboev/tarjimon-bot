@@ -2,17 +2,15 @@ from aiogram import types
 from aiogram.types import CallbackQuery, InlineKeyboardButton
 
 from config import sql, dp
+from databasa.functions import Auth_Function
 from function.functions import functions
-
-sent_number = types.ReplyKeyboardMarkup(resize_keyboard=True)
-sent_number.add(types.KeyboardButton(text="Raqamni yuborish📱", request_contact=True))
 
 
 @dp.message_handler(commands='start')
 async def welcome(message: types.Message):
     user_id = message.chat.id
 
-    # await Auth_Function(message, user_id)
+    await Auth_Function(message)
 
     sql.execute("SELECT id FROM channels")
     rows = sql.fetchall()
