@@ -3,6 +3,7 @@ from aiogram.utils import executor
 from databasa.functions import CreateBasa
 from handlaers.startFor import *
 from handlaers.admin_panel import *
+from handlaers.translator import *
 from config import dp, adminStart
 
 

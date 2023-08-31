@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton
 
 from config import sql, dp
+from function.functions import LangList, UserLangs
 
 main_btn = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 main_btn.add("📊Statistika", "🔧Kanallar", "📤Reklama", "♻️ Tozalash")
@@ -26,3 +27,29 @@ async def JoinBtn(user_id):
     join_inline.add(InlineKeyboardButton("✅Obuna bo'ldim", callback_data="check"))
 
     return join_inline
+
+async def LangsInline(user_id):
+    user_in, user_out = await UserLangs(user_id)
+
+    sql.execute(f"""select tts from public.users_tts where user_id={user_id}""")
+    tts = sql.fetchone()[0]
+
+    lang_ins, lang_outs = await LangList()
+
+    langs_inline = types.InlineKeyboardMarkup(row_width=2)
+    for lang_in, lang_out in zip(lang_ins, lang_outs):
+        Nin = ""
+        Nout = ""
+        if user_in == lang_in:
+            Nin = "✅"
+        if user_out == lang_out:
+            Nout = "✅"
+        langs_inline.add(InlineKeyboardButton(Nin+lang_in, callback_data=lang_in))
+        langs_inline.insert(InlineKeyboardButton(Nout+lang_out, callback_data=lang_out))
+    TTS = "☑️"
+    if tts:
+        TTS += "✅"
+    langs_inline.add(InlineKeyboardButton(TTS+"TTS", callback_data="TTS"))
+
+    return langs_inline
+

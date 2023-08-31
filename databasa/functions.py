@@ -144,6 +144,34 @@ ALTER FUNCTION public.user_tts()
     EXECUTE FUNCTION public.user_tts();""")
     db.commit()
 
+    sql.execute("""CREATE TABLE IF NOT EXISTS public.langs_list
+(
+    lang_in character varying(15) NOT NULL,
+    lang_out character varying(15) NOT NULL,
+    code character varying(10) NOT NULL,
+    status boolean NOT NULL DEFAULT true,
+    CONSTRAINT langs_list_pkey PRIMARY KEY (lang_in, lang_out, code)
+)""")
+    db.commit()
+
+    sql.execute("""select code from public.langs_list""")
+    check = sql.fetchone()
+    if check is None:
+
+        langL1 = ["🇺🇿O`zbek", "🇹🇷Turk", "🇹🇯Tajik", "🇬🇧English", "🇯🇵Japan", "🇮🇹Italian", "🇷🇺Русский", "🇰🇷Korean",
+                  "🇸🇦Arabic", "🇨🇳Chinese", "🇫🇷French", "🇩🇪German", "🇮🇳Hindi", "🇦🇿Azerbaijan", "🇦🇫Afghan", "🇰🇿Kazakh",
+                  "🇹🇲Turkmen", "🇰🇬Kyrgyz"]
+
+        langL2 = ["🇺🇿 O`zbek", "🇹🇷 Turk", "🇹🇯 Tajik", "🇬🇧 English", "🇯🇵 Japan", "🇮🇹 Italian", "🇷🇺 Русский", "🇰🇷 Korean",
+                  "🇸🇦 Arabic", "🇨🇳 Chinese", "🇫🇷 French", "🇩🇪 German", "🇮🇳 Hindi", "🇦🇿 Azerbaijan", "🇦🇫 Afghan", "🇰🇿 Kazakh",
+                  "🇹🇲 Turkmen", "🇰🇬 Kyrgyz"]
+
+        codes = ["uz", "tr", "tg", "en", "ja", "it", "ru", "korean", "ar", "zh-CN", "fr", "de", "hi", "az", "af", "kk",
+                 "tk", "ky"]
+        for lang1, lang2, code in zip(langL1, langL2, codes):
+            sql.execute(f"""INSERT INTO public.langs_list (lang_in, lang_out, code) VALUES ('{lang1}', '{lang2}', '{code}');""")
+            db.commit()
+
 
 async def Auth_Function(message):
     user_id = message.from_user.id
