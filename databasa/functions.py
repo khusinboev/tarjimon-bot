@@ -147,16 +147,13 @@ ALTER FUNCTION public.user_tts()
     db.commit()
 
 
-async def Auth_Function(message, user_id):
+async def Auth_Function(message):
+    user_id = message.from_user.id
 
-    sql.execute(
-        """CREATE TABLE IF NOT EXISTS users ("user_id"  INTEGER,"date"  INTEGER, "lang" INTEGER, "tel_Num" INTEGER);""")
-    db.commit()
-
-    check = sql.execute(f"""SELECT user_id FROM users WHERE user_id = {user_id}""").fetchone()
+    check = sql.execute(f"""SELECT user_id FROM accounts WHERE user_id = {user_id}""").fetchone()
 
     if check == None:
         sana = datetime.datetime.now(pytz.timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')
         sql.execute(
-            f"""INSERT INTO users (user_id, date, lang) VALUES ('{user_id}', '{sana}', '{message.from_user.language_code}')""")
+            f"""INSERT INTO accounts (user_id, date, lang) VALUES ('{user_id}', '{sana}', '{message.from_user.language_code}')""")
         db.commit()
