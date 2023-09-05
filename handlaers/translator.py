@@ -59,9 +59,11 @@ def CallFilter():
     lang_outs = sql.fetchall()
     lang_outs = [item[0] for item in lang_outs]
     lang_outs.append("TTS")
-    return lang_ins+lang_outs
-print(CallFilter())
 
-@dp.callback_query_handler(text=CallFilter)
+    alllist = lang_ins+lang_outs
+    return alllist
+
+
+@dp.callback_query_handler(text=CallFilter())
 async def check(call: CallbackQuery):
     await call.answer()
