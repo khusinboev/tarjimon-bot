@@ -1,3 +1,4 @@
+from aiogram.types import CallbackQuery
 from aiogram.utils import exceptions
 
 from config import dp, sql, db
@@ -102,3 +103,23 @@ async def UserLangs(user_id):
     user_out = sql.fetchone()[0]
 
     return user_in, user_out
+
+
+async def UserCheckLang(call: CallbackQuery):
+    user_id = call.from_user.id
+    if ' ' in call.data:
+        sql.execute(f"""select code from public.langs_list where lang_out='{call.data}'""")
+        code = sql.fetchone()[0]
+
+        sql.execute(f"""UPDATE public.user_langs SET out_lang = '{code}' WHERE user_id='{user_id}'""")
+        db.commit()
+    elif call.data == 'TTS':
+        sql.execute(f"""select tts from public.users_tts where user_id={user_id}""")
+        tts = sql.fetchone()[0]
+        sql.execute(f"""UPDATE public.users_tts SET tts = {not tts} WHERE user_id='{user_id}'""")
+        db.commit()
+    else:
+        sql.execute(f"""select code from public.langs_list where lang_in='{call.data}'""")
+        code = sql.fetchone()[0]
+        sql.execute(f"""UPDATE public.user_langs SET in_lang = '{code}' WHERE user_id='{user_id}'""")
+        db.commit()

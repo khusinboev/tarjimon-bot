@@ -7,7 +7,7 @@ from databasa.functions import Auth_Function
 from function.functions import functions
 
 
-@dp.message_handler(commands='start')
+@dp.message_handler(commands='start', chat_type=types.ChatType.PRIVATE)
 async def welcome(message: types.Message):
     user_id = message.chat.id
     sql.execute(f"""SELECT user_id FROM public.accounts WHERE user_id = {user_id}""")
@@ -20,7 +20,7 @@ async def welcome(message: types.Message):
                              reply_markup=await JoinBtn(user_id))
 
 
-@dp.callback_query_handler(text="check")
+@dp.callback_query_handler(text="check", chat_type=types.ChatType.PRIVATE)
 async def check(call: CallbackQuery):
     user_id = call.from_user.id
     if await functions.check_on_start(user_id):

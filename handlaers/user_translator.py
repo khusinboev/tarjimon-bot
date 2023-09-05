@@ -1,23 +1,22 @@
 from aiogram import types
-from aiogram.types import InlineKeyboardButton, CallbackQuery
+from aiogram.types import CallbackQuery
 from deep_translator import GoogleTranslator
 from gtts import gTTS
 
 from buttons.mButtons import JoinBtn, LangsInline
 from config import dp, adminStart, sql
 from databasa.functions import Auth_Function
-from function.functions import functions, LangList
+from function.functions import functions, UserCheckLang
 
 
-@dp.message_handler(commands='lang')
+@dp.message_handler(commands='lang', chat_type=types.ChatType.PRIVATE)
 async def change_lang(message: types.Message):
+    await message.answer("Choose languages", reply_markup=await LangsInline(message.from_user.id))
 
 
-    await message.answer("lang_in", reply_markup=await LangsInline(message.from_user.id))
-
-
-@dp.message_handler(content_types="text")
+@dp.message_handler(content_types="text", chat_type=types.ChatType.PRIVATE)
 async def translator(message: types.Message):
+    await Auth_Function(message)
     user_id = message.from_user.id
 
     if await functions.check_on_start(message.chat.id) or user_id in adminStart:
@@ -35,10 +34,14 @@ async def translator(message: types.Message):
         trText = translator.translate(message.text)
 
         if tts:
-            tts = gTTS(text=trText, lang=lang_out)
-            tts.save(f'audios/{user_id}.mp3')
-            await message.answer_audio(audio=open(f'audio/{user_id}.mp3', 'rb'),
-                                       caption=f"Tarjimasi: 👇\n\n<code>{trText}</code>", parse_mode="html")
+            try:
+                tts = gTTS(text=trText, lang=lang_out)
+                tts.save(f'Audios/{user_id}.mp3')
+
+                await message.answer_audio(audio=open(f'Audios/{user_id}.mp3', 'rb'),
+                                           caption=f"Tarjimasi: 👇\n\n<code>{trText}</code>", parse_mode="html")
+            except:
+                await message.answer(text=f"<code>{trText}</code>", parse_mode="html")
         else:
             await message.answer(text=f"<code>{trText}</code>", parse_mode="html")
 
@@ -46,8 +49,6 @@ async def translator(message: types.Message):
         await message.answer(
             "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
             reply_markup=await JoinBtn(user_id))
-
-    await Auth_Function(message)
 
 
 def CallFilter():
@@ -60,10 +61,15 @@ def CallFilter():
     lang_outs = [item[0] for item in lang_outs]
     lang_outs.append("TTS")
 
-    alllist = lang_ins+lang_outs
+    alllist = lang_ins + lang_outs
     return alllist
 
 
-@dp.callback_query_handler(text=CallFilter())
+@dp.callback_query_handler(text=CallFilter(), chat_type=types.ChatType.PRIVATE)
 async def check(call: CallbackQuery):
     await call.answer()
+    await UserCheckLang(call)
+    try:
+        await call.message.edit_reply_markup(await LangsInline(call.from_user.id))
+    except:
+        pass

@@ -48,7 +48,7 @@ async def LangsInline(user_id):
         langs_inline.insert(InlineKeyboardButton(Nout+lang_out, callback_data=lang_out))
     TTS = "☑️"
     if tts:
-        TTS += "✅"
+        TTS = "✅"
     langs_inline.add(InlineKeyboardButton(TTS+"TTS", callback_data="TTS"))
 
     return langs_inline
