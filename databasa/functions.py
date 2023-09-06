@@ -1,4 +1,5 @@
 import datetime
+from aiogram import types
 import pytz
 
 from config import sql, db
@@ -34,6 +35,15 @@ async def CreateBasa():
     username character varying,
     types character varying,
     CONSTRAINT groups_pkey PRIMARY KEY (id)
+)""")
+    db.commit()
+
+    sql.execute("""CREATE TABLE IF NOT EXISTS public.group_langs
+(
+    chat_id bigint NOT NULL,
+    in_lang character varying(25) NOT NULL DEFAULT 'uz',
+    out_lang character varying(25) NOT NULL DEFAULT 'en',
+    CONSTRAINT group_langs_pkey PRIMARY KEY (chat_id)
 )""")
     db.commit()
 
@@ -122,6 +132,31 @@ ALTER FUNCTION public.user_tts()
     OWNER TO postgres;""")
     db.commit()
 
+    sql.execute("""CREATE OR REPLACE FUNCTION public.group_lang()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+begin
+	insert into group_langs( chat_id, in_lang, out_lang )
+	values( new.chat_id, 'uz', 'en' );
+	return null;
+end
+$BODY$;
+
+ALTER FUNCTION public.group_lang()
+    OWNER TO postgres;
+""")
+    db.commit()
+
+    sql.execute("""CREATE OR REPLACE TRIGGER group_lang
+    AFTER INSERT
+    ON public.groups
+    FOR EACH ROW
+    EXECUTE FUNCTION public.group_lang();""")
+    db.commit()
+
     sql.execute("""CREATE OR REPLACE TRIGGER user_lang
     AFTER INSERT
     ON public.accounts
@@ -184,4 +219,14 @@ async def Auth_Function(message):
         sana = datetime.datetime.now(pytz.timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')
         sql.execute(
             f"""INSERT INTO accounts (user_id, username, lang_code) VALUES ('{user_id}', '{username}', '{lang_code}')""")
+        db.commit()
+
+
+async def Auth_Group_Function(chat_id, type):
+
+    sql.execute(f"""SELECT chat_id FROM groups WHERE chat_id = {chat_id}""")
+    check = sql.fetchone()
+    if check == None:
+        sql.execute(
+            f"""INSERT INTO groups (chat_id, types) VALUES ('{chat_id}', '{type}')""")
         db.commit()

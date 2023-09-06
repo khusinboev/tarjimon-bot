@@ -14,6 +14,12 @@ async def change_lang(message: types.Message):
     await message.answer("Choose languages", reply_markup=await LangsInline(message.from_user.id))
 
 
+@dp.message_handler(commands='help', chat_type=types.ChatType.PRIVATE)
+async def change_lang(message: types.Message):
+    await message.answer_video(video=open('video/useBot.mp4', 'rb'),
+                               caption="Botdan foydalanish uchun qo'llanma/Manual for using the bot\n\n\nFor help admin: @coder_admin_py")
+
+
 @dp.message_handler(content_types="text", chat_type=types.ChatType.PRIVATE)
 async def translator(message: types.Message):
     await Auth_Function(message)

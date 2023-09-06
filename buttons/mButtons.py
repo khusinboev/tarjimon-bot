@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton
 
 from config import sql, dp
-from function.functions import LangList, UserLangs
+from function.functions import LangList, UserLangs, Group_Lang
 
 main_btn = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 main_btn.add("📊Statistika", "🔧Kanallar", "📤Reklama", "♻️ Tozalash")
@@ -53,3 +53,21 @@ async def LangsInline(user_id):
 
     return langs_inline
 
+
+async def Group_Lang_Inline(chat_id):
+    chat_in, chat_out = await Group_Lang(chat_id)
+
+    lang_ins, lang_outs = await LangList()
+
+    langs_inline = types.InlineKeyboardMarkup(row_width=2)
+    for lang_in, lang_out in zip(lang_ins, lang_outs):
+        Nin = ""
+        Nout = ""
+        if chat_in == lang_in:
+            Nin = "✅"
+        if chat_out == lang_out:
+            Nout = "✅"
+        langs_inline.add(InlineKeyboardButton(Nin+lang_in, callback_data=lang_in))
+        langs_inline.insert(InlineKeyboardButton(Nout+lang_out, callback_data=lang_out))
+
+    return langs_inline

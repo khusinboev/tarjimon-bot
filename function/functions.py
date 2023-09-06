@@ -93,6 +93,7 @@ async def LangList():
 
     return lang_ins, lang_outs
 
+
 async def UserLangs(user_id):
     sql.execute(f"""select lang_in from public.langs_list where code=(
     select in_lang from public.user_langs where user_id={user_id})""")
@@ -103,6 +104,18 @@ async def UserLangs(user_id):
     user_out = sql.fetchone()[0]
 
     return user_in, user_out
+
+
+async def Group_Lang(chat_id):
+    sql.execute(f"""select lang_in from public.langs_list where code=(
+    select in_lang from public.group_langs where chat_id={chat_id})""")
+    chat_in = sql.fetchone()[0]
+
+    sql.execute(f"""select lang_out from public.langs_list where code=(
+    select out_lang from public.group_langs where chat_id={chat_id})""")
+    chat_out = sql.fetchone()[0]
+
+    return chat_in, chat_out
 
 
 async def UserCheckLang(call: CallbackQuery):
@@ -122,4 +135,19 @@ async def UserCheckLang(call: CallbackQuery):
         sql.execute(f"""select code from public.langs_list where lang_in='{call.data}'""")
         code = sql.fetchone()[0]
         sql.execute(f"""UPDATE public.user_langs SET in_lang = '{code}' WHERE user_id='{user_id}'""")
+        db.commit()
+
+
+async def GroupCheckLang(call: CallbackQuery):
+    chat_id = call.message.chat.id
+    if ' ' in call.data:
+        sql.execute(f"""select code from public.langs_list where lang_out='{call.data}'""")
+        code = sql.fetchone()[0]
+
+        sql.execute(f"""UPDATE public.group_langs SET out_lang = '{code}' WHERE chat_id='{chat_id}'""")
+        db.commit()
+    else:
+        sql.execute(f"""select code from public.langs_list where lang_in='{call.data}'""")
+        code = sql.fetchone()[0]
+        sql.execute(f"""UPDATE public.group_langs SET in_lang = '{code}' WHERE chat_id='{chat_id}'""")
         db.commit()
