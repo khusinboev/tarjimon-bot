@@ -1,4 +1,5 @@
 import datetime
+from aiogram import types
 import pytz
 
 from config import sql, db
@@ -7,11 +8,9 @@ from config import sql, db
 async def CreateBasa():
     sql.execute("""CREATE TABLE IF NOT EXISTS public.accounts
 (
-    id bigint NOT NULL,
+    id SERIAL NOT NULL,
     user_id bigint NOT NULL,
-    user_name character varying(32),
-    first_name character varying(64),
-    last_name character varying(64),
+    username character varying(32),
     lang_code character varying(10),
     CONSTRAINT accounts_pkey PRIMARY KEY (id)
 )""")
@@ -19,7 +18,7 @@ async def CreateBasa():
 
     sql.execute("""CREATE TABLE IF NOT EXISTS public.channels
 (
-    id bigint NOT NULL,
+    id SERIAL NOT NULL,
     chat_id bigint NOT NULL,
     title character varying,
     username character varying,
@@ -30,7 +29,7 @@ async def CreateBasa():
 
     sql.execute("""CREATE TABLE IF NOT EXISTS public.groups
 (
-    id bigint NOT NULL,
+    id SERIAL NOT NULL,
     chat_id bigint NOT NULL,
     title character varying,
     username character varying,
@@ -39,10 +38,19 @@ async def CreateBasa():
 )""")
     db.commit()
 
+    sql.execute("""CREATE TABLE IF NOT EXISTS public.group_langs
+(
+    chat_id bigint NOT NULL,
+    in_lang character varying(25) NOT NULL DEFAULT 'uz',
+    out_lang character varying(25) NOT NULL DEFAULT 'en',
+    CONSTRAINT group_langs_pkey PRIMARY KEY (chat_id)
+)""")
+    db.commit()
+
     sql.execute("""CREATE TABLE IF NOT EXISTS public.mandatorys
 (
-    id bigint NOT NULL,
-    chat_id bigint NOT NULL,
+    id SERIAL NOT NULL,
+    chat_id character varying NOT NULL,
     CONSTRAINT mandatorys_pkey PRIMARY KEY (id)
 )""")
     db.commit()
@@ -124,6 +132,31 @@ ALTER FUNCTION public.user_tts()
     OWNER TO postgres;""")
     db.commit()
 
+    sql.execute("""CREATE OR REPLACE FUNCTION public.group_lang()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+begin
+	insert into group_langs( chat_id, in_lang, out_lang )
+	values( new.chat_id, 'uz', 'en' );
+	return null;
+end
+$BODY$;
+
+ALTER FUNCTION public.group_lang()
+    OWNER TO postgres;
+""")
+    db.commit()
+
+    sql.execute("""CREATE OR REPLACE TRIGGER group_lang
+    AFTER INSERT
+    ON public.groups
+    FOR EACH ROW
+    EXECUTE FUNCTION public.group_lang();""")
+    db.commit()
+
     sql.execute("""CREATE OR REPLACE TRIGGER user_lang
     AFTER INSERT
     ON public.accounts
@@ -146,14 +179,54 @@ ALTER FUNCTION public.user_tts()
     EXECUTE FUNCTION public.user_tts();""")
     db.commit()
 
+    sql.execute("""CREATE TABLE IF NOT EXISTS public.langs_list
+(
+    lang_in character varying(15) NOT NULL,
+    lang_out character varying(15) NOT NULL,
+    code character varying(10) NOT NULL,
+    status boolean NOT NULL DEFAULT true,
+    CONSTRAINT langs_list_pkey PRIMARY KEY (lang_in, lang_out, code)
+)""")
+    db.commit()
+
+    sql.execute("""select code from public.langs_list""")
+    check = sql.fetchone()
+    if check is None:
+
+        langL1 = ["🇺🇿O`zbek", "🇹🇷Turk", "🇹🇯Tajik", "🇬🇧English", "🇯🇵Japan", "🇮🇹Italian", "🇷🇺Русский", "🇰🇷Korean",
+                  "🇸🇦Arabic", "🇨🇳Chinese", "🇫🇷French", "🇩🇪German", "🇮🇳Hindi", "🇦🇿Azerbaijan", "🇦🇫Afghan", "🇰🇿Kazakh",
+                  "🇹🇲Turkmen", "🇰🇬Kyrgyz"]
+
+        langL2 = ["🇺🇿 O`zbek", "🇹🇷 Turk", "🇹🇯 Tajik", "🇬🇧 English", "🇯🇵 Japan", "🇮🇹 Italian", "🇷🇺 Русский", "🇰🇷 Korean",
+                  "🇸🇦 Arabic", "🇨🇳 Chinese", "🇫🇷 French", "🇩🇪 German", "🇮🇳 Hindi", "🇦🇿 Azerbaijan", "🇦🇫 Afghan", "🇰🇿 Kazakh",
+                  "🇹🇲 Turkmen", "🇰🇬 Kyrgyz"]
+
+        codes = ["uz", "tr", "tg", "en", "ja", "it", "ru", "korean", "ar", "zh-CN", "fr", "de", "hi", "az", "af", "kk",
+                 "tk", "ky"]
+        for lang1, lang2, code in zip(langL1, langL2, codes):
+            sql.execute(f"""INSERT INTO public.langs_list (lang_in, lang_out, code) VALUES ('{lang1}', '{lang2}', '{code}');""")
+            db.commit()
+
 
 async def Auth_Function(message):
     user_id = message.from_user.id
+    username = message.from_user.username
+    lang_code = message.from_user.language_code
 
-    check = sql.execute(f"""SELECT user_id FROM accounts WHERE user_id = {user_id}""").fetchone()
-
+    sql.execute(f"""SELECT user_id FROM accounts WHERE user_id = {user_id}""")
+    check = sql.fetchone()
     if check == None:
         sana = datetime.datetime.now(pytz.timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')
         sql.execute(
-            f"""INSERT INTO accounts (user_id, date, lang) VALUES ('{user_id}', '{sana}', '{message.from_user.language_code}')""")
+            f"""INSERT INTO accounts (user_id, username, lang_code) VALUES ('{user_id}', '{username}', '{lang_code}')""")
+        db.commit()
+
+
+async def Auth_Group_Function(chat_id, type):
+
+    sql.execute(f"""SELECT chat_id FROM groups WHERE chat_id = {chat_id}""")
+    check = sql.fetchone()
+    if check == None:
+        sql.execute(
+            f"""INSERT INTO groups (chat_id, types) VALUES ('{chat_id}', '{type}')""")
         db.commit()
