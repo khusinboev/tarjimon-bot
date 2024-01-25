@@ -15,7 +15,9 @@ async def welcome(message: types.Message):
 
     if await functions.check_on_start(message.from_user.id):
         await message.answer(
-            f"""Assalomu alaykum! Bot 16 ta tilda so'zlar va matnlarni tarjima qiladi. Ikkita ustundan ham tilni tanlash shart\n\n\n/lang /lang /lang\n/lang /lang /lang""")
+            f"""Assalomu alaykum! Bot 16 ta tilda so'zlar va matnlarni tarjima qiladi. Ikkita ustundan ham tilni 
+            tanlash shart\n\nGreetings! The bot translates words and texts in 16 languages. You must select a language 
+            from both columns \n\n/lang /lang /lang\n/lang /lang /lang""")
     else:
         await message.answer("Botimizdan foydalanish uchun kanalimizga azo bo'ling",
                              reply_markup=await JoinBtn(user_id))

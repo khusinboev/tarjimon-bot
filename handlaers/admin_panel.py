@@ -48,7 +48,8 @@ async def new(msg: types.Message):
     await msg.answer("Tanlang", reply_markup=channel_btn)
 
 
-@dp.message_handler(state=[From.channelDelete, From.channelAdd], text="🔙Orqaga qaytish", user_id=adminStart, chat_type=types.ChatType.PRIVATE)
+@dp.message_handler(state=[From.channelDelete, From.channelAdd], text="🔙Orqaga qaytish", user_id=adminStart,
+                    chat_type=types.ChatType.PRIVATE)
 async def backs(message: types.Message, state: FSMContext):
     await message.reply("Orqaga qaytildi", reply_markup=channel_btn)
     await state.finish()
@@ -136,7 +137,8 @@ async def all_users(message: types.Message, state: FSMContext):
     await From.forward_msg.set()
 
 
-@dp.message_handler(state=From.forward_msg, content_types=ContentType.ANY, user_id=adminStart, chat_type=types.ChatType.PRIVATE)
+@dp.message_handler(state=From.forward_msg, content_types=ContentType.ANY, user_id=adminStart,
+                    chat_type=types.ChatType.PRIVATE)
 async def all_users2(message: types.Message, state: FSMContext):
     await state.finish()
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -150,7 +152,8 @@ async def all_users2(message: types.Message, state: FSMContext):
     await message.answer("Xabar yuborish yakunlandi", reply_markup=reklama_btn)
 
 
-@dp.message_handler(lambda message: message.text == "📬Oddiy xabar yuborish", user_id=adminStart, chat_type=types.ChatType.PRIVATE)
+@dp.message_handler(lambda message: message.text == "📬Oddiy xabar yuborish", user_id=adminStart,
+                    chat_type=types.ChatType.PRIVATE)
 async def all_users(message: types.Message, state: FSMContext):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add("🔙Orqaga qaytish")
@@ -158,7 +161,8 @@ async def all_users(message: types.Message, state: FSMContext):
     await From.send_msg.set()
 
 
-@dp.message_handler(state=From.send_msg, content_types=ContentType.ANY, user_id=adminStart, chat_type=types.ChatType.PRIVATE)
+@dp.message_handler(state=From.send_msg, content_types=ContentType.ANY, user_id=adminStart,
+                    chat_type=types.ChatType.PRIVATE)
 async def all_users2(message: types.Message, state: FSMContext):
     await state.finish()
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -180,7 +184,8 @@ async def clear(message: types.Message):
     await From.clear_msg.set()
 
 
-@dp.message_handler(state=From.clear_msg, text="🔙Orqaga qaytish", content_types=ContentType.ANY, user_id=adminStart, chat_type=types.ChatType.PRIVATE)
+@dp.message_handler(state=From.clear_msg, text="🔙Orqaga qaytish", content_types=ContentType.ANY, user_id=adminStart,
+                    chat_type=types.ChatType.PRIVATE)
 async def all_users2(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply("Orqaga qaytildi", reply_markup=main_btn)
