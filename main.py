@@ -12,6 +12,8 @@ from config import dp, adminStart
 
 async def on_startup(dp):
     await dp.bot.send_message(chat_id=adminStart, text="Successful. Bot started!")
+    print('bot started')
+    print(await bot.get_me())
     await CreateBasa()
 
 

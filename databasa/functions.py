@@ -98,66 +98,67 @@ ALTER FUNCTION public.user_lang()
     OWNER TO postgres;""")
     db.commit()
 
-    sql.execute("""CREATE OR REPLACE FUNCTION public.user_status()
-                        RETURNS trigger
-                        LANGUAGE 'plpgsql'
-                        COST 100
-                        VOLATILE NOT LEAKPROOF
-                    AS $BODY$
-                    begin
-                        insert into users_status( user_id, date, active_date )
-                        values( new.user_id, date( current_date at time zone 'Asia/Tashkent' ), date( current_date at time zone 'Asia/Tashkent' ) );
-                        return null;
-                    end
-                    $BODY$;
-                    ALTER FUNCTION public.user_status()
-                        OWNER TO postgres;""")
+    sql.execute("""
+    CREATE OR REPLACE FUNCTION public.user_status()
+        RETURNS trigger
+        LANGUAGE 'plpgsql'
+        COST 100
+        VOLATILE NOT LEAKPROOF
+    AS $BODY$
+    begin
+        insert into users_status( user_id, date, active_date )
+        values( new.user_id, date( current_date at time zone 'Asia/Tashkent' ), date( current_date at time zone 'Asia/Tashkent' ) );
+        return null;
+    end
+    $BODY$;
+    ALTER FUNCTION public.user_status()
+        OWNER TO postgres;""")
     db.commit()
 
     sql.execute("""
-CREATE OR REPLACE FUNCTION public.user_tts()
+    CREATE OR REPLACE FUNCTION public.user_tts()
+        RETURNS trigger
+        LANGUAGE 'plpgsql'
+        COST 100
+        VOLATILE NOT LEAKPROOF
+    AS $BODY$
+    begin
+        insert into users_tts( user_id, tts )
+        values( new.user_id, 'false' );
+        return Null;
+    end
+    $BODY$;
+    ALTER FUNCTION public.user_tts()
+        OWNER TO postgres;""")
+    db.commit()
+
+    sql.execute("""
+CREATE OR REPLACE FUNCTION public.group_lang()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE NOT LEAKPROOF
 AS $BODY$
 begin
-	insert into users_tts( user_id, tts )
-	values( new.user_id, 'false' );
-	return Null;
+    insert into group_langs( chat_id, in_lang, out_lang )
+    values( new.chat_id, 'uz', 'en' );
+    return null;
 end
 $BODY$;
-
-ALTER FUNCTION public.user_tts()
+ALTER FUNCTION public.group_lang()
     OWNER TO postgres;""")
     db.commit()
 
-    sql.execute("""CREATE OR REPLACE FUNCTION public.group_lang()
-    RETURNS trigger
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE NOT LEAKPROOF
-AS $BODY$
-begin
-	insert into group_langs( chat_id, in_lang, out_lang )
-	values( new.chat_id, 'uz', 'en' );
-	return null;
-end
-$BODY$;
-
-ALTER FUNCTION public.group_lang()
-    OWNER TO postgres;
-""")
-    db.commit()
-
-    sql.execute("""CREATE OR REPLACE TRIGGER group_lang
+    sql.execute("""
+    CREATE OR REPLACE TRIGGER group_lang
     AFTER INSERT
     ON public.groups
     FOR EACH ROW
     EXECUTE FUNCTION public.group_lang();""")
     db.commit()
 
-    sql.execute("""CREATE OR REPLACE TRIGGER user_lang
+    sql.execute("""
+    CREATE OR REPLACE TRIGGER user_lang
     AFTER INSERT
     ON public.accounts
     FOR EACH ROW
