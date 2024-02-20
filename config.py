@@ -2,12 +2,11 @@ import psycopg2
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import os
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
+
 
 TOKEN = os.environ['BOT_TOKEN']
 adminStart = os.environ['ADMINSTART']
-adminPanel = [int(os.environ['ADMINSTART']), int(os.environ['ADMINPANEL'])]
+adminPanel = [os.environ['ADMINSTART'], os.environ['ADMINPANEL']]
 
 DB_NAME = os.environ['DB_NAME']
 DB_USER = os.environ['DB_USER']
@@ -21,6 +20,6 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(bot=bot, storage=storage)
 
 db = psycopg2.connect(
-    database=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT)
+    database="users", user='postgres', password='paro!123', host='127.0.0.1', port='5432')
 db.autocommit = True
 sql = db.cursor()  # Connection database of Postgres

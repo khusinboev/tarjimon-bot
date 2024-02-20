@@ -1,34 +1,22 @@
-import asyncio
-import json
-import os
-
-import aiohttp
-import multitasking
-import requests
 from aiogram import types
-from aiogram.types import CallbackQuery, ChatActions
+from aiogram.types import CallbackQuery
 from deep_translator import GoogleTranslator
 from gtts import gTTS
-import cv2
-import easyocr
-import matplotlib.pyplot as plt
 
 from buttons.mButtons import JoinBtn, LangsInline
-from config import dp, bot, adminPanel, sql, TOKEN
+from config import dp, adminPanel, sql
 from databasa.functions import Auth_Function
 from function.functions import functions, UserCheckLang
 
 
 @dp.message_handler(commands='lang', chat_type=types.ChatType.PRIVATE)
 async def change_lang(message: types.Message):
-    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)
     await Auth_Function(message)
     await message.answer("Choose languages", reply_markup=await LangsInline(message.from_user.id))
 
 
 @dp.message_handler(commands='help', chat_type=types.ChatType.PRIVATE)
 async def change_lang(message: types.Message):
-    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.UPLOAD_VIDEO)
     await Auth_Function(message)
     await message.answer_video(video=open('video/useBot.mp4', 'rb'),
                                caption="Botdan foydalanish uchun qo'llanma/Manual for using the bot\n\n\nFor help admin: @coder_admin_py")
@@ -36,7 +24,6 @@ async def change_lang(message: types.Message):
 
 @dp.message_handler(content_types="text", chat_type=types.ChatType.PRIVATE)
 async def translator(message: types.Message):
-    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)
     await Auth_Function(message)
     user_id = message.from_user.id
     try:
@@ -63,7 +50,6 @@ async def translator(message: types.Message):
                                                caption=f"Tarjimasi: 👇\n\n<code>{trText}</code>", parse_mode="html")
                 except:
                     await message.answer(text=f"<code>{trText}</code>", parse_mode="html")
-                    await bot.send_message(chat_id=2)
             else:
                 await message.answer(text=f"<code>{trText}</code>", parse_mode="html")
 
@@ -76,7 +62,6 @@ async def translator(message: types.Message):
 
 
 def CallFilter(all):
-    print(all)
     sql.execute(f"""select lang_in from public.langs_list""")
     lang_ins = sql.fetchall()
     lang_ins = [item[0] for item in lang_ins]
@@ -99,76 +84,4 @@ async def check(call: CallbackQuery):
         try:
             await call.message.edit_reply_markup(await LangsInline(call.from_user.id))
         except Exception as ex:
-            print(ex)
             await call.message.delete()
-
-
-@dp.message_handler(content_types=types.ContentType.PHOTO, chat_type=types.ChatType.PRIVATE)
-async def photo_tr_jpg(message: types.Message):
-    await message.answer("Waiting...")
-    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.UPLOAD_PHOTO)
-    file_name = f"photos/{message.from_user.id}.jpg"
-    photo = message.photo[-1]
-    photo_file = await photo.get_file()
-    await photo_file.download(destination_file=file_name)
-
-    loop = asyncio.get_running_loop()
-    loop.run_in_executor(None, lambda: asyncio.run(photo_tr(image_path=file_name,
-                                                            user_id=message.from_user.id,
-                                                            message=message)))
-
-
-@dp.message_handler(content_types=types.ContentType.DOCUMENT, chat_type=types.ChatType.PRIVATE)
-async def photo_tr_other(message: types.Message):
-    await message.answer("Waiting...")
-    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.UPLOAD_PHOTO)
-    document = message.document
-    file_name = f"photos/{message.from_user.id}.png"
-    document_file = await document.get_file()
-    await document_file.download(destination_file=file_name)
-
-    loop = asyncio.get_running_loop()
-    loop.run_in_executor(None, lambda: asyncio.run(photo_tr(image_path=file_name,
-                                                            user_id=message.from_user.id,
-                                                            message=message)))
-
-
-async def photo_tr(image_path, user_id, message: types.Message):
-    sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
-    lang_in = sql.fetchone()[0]
-    sql.execute(f"""select out_lang from public.user_langs where user_id={user_id}""")
-    lang_out = sql.fetchone()[0]
-    translater = GoogleTranslator(source=lang_in, target=lang_out)
-
-    img = cv2.imread(image_path)
-    reader = easyocr.Reader([lang_in], gpu=False)
-    text_ = reader.readtext(img)
-    threshold = 0.25
-    texts = ''
-    res = True
-    for t_, t in enumerate(text_):
-        bbox, text, score = t
-
-        if score > threshold:
-            texts += f"{text}\n"
-
-    res_text = "None"
-    if res:
-        plt.imsave(image_path, img)
-        if len(texts) > 2:
-            if lang_in == lang_out:
-                res_text = texts
-            else:
-                res_text = translater.translate(texts)
-
-    else:
-        if len(texts) > 2:
-            if lang_in == lang_out:
-                res_text = texts
-            else:
-                res_text = translater.translate(texts)
-
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    response = requests.post(url, data={'chat_id': user_id, 'text': res_text})
-    content = response.content.decode("utf8")
-    json.loads(content)
