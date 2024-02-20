@@ -3,3 +3,5 @@ deep-translator==1.11.4
 gTTS==2.3.2
 psycopg2==2.9.7
 pytz==2023.3
+easyocr==1.7.1
+matplotlib==3.8.2

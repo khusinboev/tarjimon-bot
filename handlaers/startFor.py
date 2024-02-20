@@ -1,15 +1,16 @@
 from aiogram import types
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, ChatActions
 
 from buttons.mButtons import JoinBtn, LangsInline
-from config import sql, dp
+from config import sql, dp, bot
 from databasa.functions import Auth_Function
 from function.functions import functions
 
 
 @dp.message_handler(commands='start', chat_type=types.ChatType.PRIVATE)
 async def welcome(message: types.Message):
-    user_id = message.chat.id
+    user_id = message.from_user.id
+    await bot.send_chat_action(chat_id=user_id, action=ChatActions.TYPING)
     sql.execute(f"""SELECT user_id FROM public.accounts WHERE user_id = {user_id}""")
     await Auth_Function(message)
 
