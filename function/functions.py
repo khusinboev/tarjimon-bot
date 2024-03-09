@@ -1,7 +1,7 @@
 from aiogram.types import CallbackQuery
 from aiogram.utils import exceptions
 
-from config import dp, sql, db
+from config import dp, sql, db, adminPanel
 
 
 class functions:
@@ -12,7 +12,7 @@ class functions:
         error_code = 0
         for row in rows:
             r = await dp.bot.get_chat_member(chat_id=row[0], user_id=user_id)
-            if r.status in ['member', 'creator', 'admin']:
+            if r.status in ['member', 'creator', 'admin'] or user_id in adminPanel:
                 pass
             else:
                 error_code = 1

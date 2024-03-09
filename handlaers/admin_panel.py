@@ -1,17 +1,18 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import ContentType, ReplyKeyboardMarkup
+from aiogram.types import ContentType, ReplyKeyboardMarkup, ChatActions
 from aiogram.utils.exceptions import BotBlocked, ChatNotFound, RetryAfter, UserDeactivated, MigrateToChat, \
     TelegramAPIError
 
 from Statess.statess import From
 from buttons.mButtons import channel_btn, main_btn, reklama_btn
-from config import dp, sql, db, adminStart
+from config import dp, bot, sql, db, adminStart
 from function.functions import panel_func, forward_send_msg, send_message_chats
 
 
 @dp.message_handler(commands=["developer", 'coder', 'programmer'], chat_type=types.ChatType.PRIVATE)
 async def coder(msg: types.Message):
+    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)
     await msg.reply("Bot dasturchisi @coder_admin_py\n\nPowered by @coder_admin_py", parse_mode='html')
 
 
@@ -28,6 +29,7 @@ async def new(msg: types.Message):
 
 @dp.message_handler(text="🔙Orqaga qaytish", user_id=adminStart, chat_type=types.ChatType.PRIVATE)
 async def backs(message: types.Message):
+    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)
     await message.reply("Bosh menyu", reply_markup=main_btn)
 
 

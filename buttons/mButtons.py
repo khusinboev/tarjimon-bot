@@ -14,7 +14,6 @@ channel_btn.add("📋 Kanallar ro'yxati", "🔙Orqaga qaytish")
 reklama_btn = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 reklama_btn.add("📨Forward xabar yuborish", "📬Oddiy xabar yuborish", "🔙Orqaga qaytish")
 
-
 async def JoinBtn(user_id):
     sql.execute("SELECT chat_id FROM public.mandatorys")
     rows = sql.fetchall()
@@ -28,7 +27,6 @@ async def JoinBtn(user_id):
     join_inline.add(InlineKeyboardButton("✅Obuna bo'ldim", callback_data="check"))
 
     return join_inline
-
 
 async def LangsInline(user_id):
     user_in, user_out = await UserLangs(user_id)
@@ -58,7 +56,9 @@ async def LangsInline(user_id):
 
 async def Group_Lang_Inline(chat_id):
     chat_in, chat_out = await Group_Lang(chat_id)
+
     lang_ins, lang_outs = await LangList()
+
     langs_inline = types.InlineKeyboardMarkup(row_width=2)
     for lang_in, lang_out in zip(lang_ins, lang_outs):
         Nin = ""

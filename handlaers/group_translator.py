@@ -9,7 +9,7 @@ from function.functions import GroupCheckLang
 from handlaers.user_translator import CallFilter
 
 
-@dp.message_handler(content_types="any", chat_type=types.ChatType.PRIVATE)
+@dp.message_handler(content_types="any", chat_type=[types.ChatType.GROUP, types.ChatType.SUPERGROUP])
 async def helper(message: types.Message):
     try:
         # await message.answer("Bot starting in 5 minutes")
@@ -18,50 +18,50 @@ async def helper(message: types.Message):
         pass
 
 
-async def Check(message: types.Message):
-    info = await bot.get_me()
-    return message.reply_to_message['from']['username'] == info.username
-
-
-@dp.message_handler(chat_type=[types.ChatType.GROUP, types.ChatType.SUPERGROUP], commands=['start', 'lang', 'help'])
-async def group_handle(message: types.Message):
-    await Auth_Group_Function(message.chat.id, message.chat.type)
-    # if 'help' in message.text:
-    #     await message.answer("Murojaat uchun/For reference admin: @coder_admin_py")
-    # if 'start' in message.text:
-    #     await message.answer("Bot started. /lang ")
-    # else:
-    #     await message.answer("Kerakli tilni tanlang/Choose your language", reply_markup=await Group_Lang_Inline(message.chat.id))
-
-
-@dp.callback_query_handler(text=CallFilter("all"), chat_type=[types.ChatType.GROUP, types.ChatType.SUPERGROUP])
-async def check(call: CallbackQuery):
-    await Auth_Group_Function(call.message.chat.id, call.message.chat.type)
-    # await GroupCheckLang(call)
-    # await call.answer()
-    # try:
-    #     await call.message.edit_reply_markup(await Group_Lang_Inline(call.message.chat.id))
-    # except:
-    #     pass
-
-
-@dp.message_handler(lambda message: Check(message), content_types=types.ContentTypes.TEXT,
-                    chat_type=[types.ChatType.GROUP, types.ChatType.SUPERGROUP])
-async def group_handle(message: types.Message):
-    await Auth_Group_Function(message.chat.id, message.chat.type)
-    # try:
-    #     chat_id = message.chat.id
-    #     sql.execute(f"""select in_lang from public.group_langs where chat_id={chat_id}""")
-    #     lang_in = sql.fetchone()[0]
-    #
-    #     sql.execute(f"""select out_lang from public.group_langs where chat_id={chat_id}""")
-    #     lang_out = sql.fetchone()[0]
-    #
-    #     translator = GoogleTranslator(source=lang_in, target=lang_out)
-    #     text = translator.translate(message.text)
-    #     try:
-    #         await message.reply(text=f"<code>{text}</code>", parse_mode="html")
-    #     except:
-    #         await message.answer(text=f"<code>{text}</code>", parse_mode="html")
-    # except:
-    #     await message.answer("/start /lang")
+# async def Check(message: types.Message):
+#     info = await bot.get_me()
+#     return message.reply_to_message['from']['username'] == info.username
+#
+#
+# @dp.message_handler(chat_type=[types.ChatType.GROUP, types.ChatType.SUPERGROUP], commands=['start', 'lang', 'help'])
+# async def group_handle(message: types.Message):
+#     await Auth_Group_Function(message.chat.id, message.chat.type)
+#     if 'help' in message.text:
+#         await message.answer("Murojaat uchun/For reference admin: @coder_admin_py")
+#     if 'start' in message.text:
+#         await message.answer("Bot started. /lang ")
+#     else:
+#         await message.answer("Kerakli tilni tanlang/Choose your language", reply_markup=await Group_Lang_Inline(message.chat.id))
+#
+#
+# @dp.callback_query_handler(chat_type=[types.ChatType.GROUP, types.ChatType.SUPERGROUP])
+# async def check(call: CallbackQuery):
+#     await Auth_Group_Function(call.message.chat.id, call.message.chat.type)
+#     await GroupCheckLang(call)
+#     await call.answer()
+#     try:
+#         await call.message.edit_reply_markup(await Group_Lang_Inline(call.message.chat.id))
+#     except:
+#         pass
+#
+#
+# @dp.message_handler(lambda message: Check(message), content_types=types.ContentTypes.TEXT,
+#                     chat_type=[types.ChatType.GROUP, types.ChatType.SUPERGROUP])
+# async def group_handle(message: types.Message):
+#     try:
+#         await Auth_Group_Function(message.chat.id, message.chat.type)
+#         chat_id = message.chat.id
+#         sql.execute(f"""select in_lang from public.group_langs where chat_id={chat_id}""")
+#         lang_in = sql.fetchone()[0]
+#
+#         sql.execute(f"""select out_lang from public.group_langs where chat_id={chat_id}""")
+#         lang_out = sql.fetchone()[0]
+#
+#         translator = GoogleTranslator(source=lang_in, target=lang_out)
+#         text = translator.translate(message.text)
+#         try:
+#             await message.reply(text=f"<code>{text}</code>", parse_mode="html")
+#         except:
+#             await message.answer(text=f"<code>{text}</code>", parse_mode="html")
+#     except:
+#         await message.answer("/start /lang")
