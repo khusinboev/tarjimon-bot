@@ -1,14 +1,10 @@
-import asyncio
-import json
-import requests
+from asyncio import exceptions
+
 from aiogram import types
 from aiogram.types import CallbackQuery, ChatActions
 from deep_translator import GoogleTranslator
 from gtts import gTTS
-# import cv2
-# import easyocr
-# import matplotlib.pyplot as plt
-
+from aiogram.utils import exceptions
 from buttons.mButtons import JoinBtn, LangsInline
 from config import dp, bot, adminPanel, sql, TOKEN, adminStart
 from databasa.functions import Auth_Function
@@ -60,7 +56,6 @@ async def translator(message: types.Message):
                                                caption=f"Tarjimasi: 👇\n\n<code>{trText}</code>", parse_mode="html")
                 except:
                     await message.answer(text=f"<code>{trText}</code>", parse_mode="html")
-                    await bot.send_message(chat_id=2)
             else:
                 await message.answer(text=f"<code>{trText}</code>", parse_mode="html")
 
@@ -90,8 +85,10 @@ def CallFilter(all):
 @dp.callback_query_handler(chat_type=types.ChatType.PRIVATE)
 async def check(call: CallbackQuery):
     if call.data in CallFilter("all"):
-
-        await call.answer()
+        try:
+            await call.answer()
+        except exceptions.InvalidQueryID:
+            pass
         await UserCheckLang(call)
         try:
             await call.message.edit_reply_markup(await LangsInline(call.from_user.id))
