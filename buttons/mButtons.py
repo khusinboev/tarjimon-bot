@@ -1,18 +1,16 @@
 from aiogram import types
 from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton
-
 from config import sql, dp
 from function.functions import LangList, UserLangs, Group_Lang
 
 main_btn = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 main_btn.add("📊Statistika", "🔧Kanallar", "📤Reklama", "♻️ Tozalash")
-
 channel_btn = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 channel_btn.add("➕Kanal qo'shish", "❌Kanalni olib tashlash")
 channel_btn.add("📋 Kanallar ro'yxati", "🔙Orqaga qaytish")
-
 reklama_btn = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 reklama_btn.add("📨Forward xabar yuborish", "📬Oddiy xabar yuborish", "🔙Orqaga qaytish")
+
 
 async def JoinBtn(user_id):
     sql.execute("SELECT chat_id FROM public.mandatorys")
@@ -27,6 +25,7 @@ async def JoinBtn(user_id):
     join_inline.add(InlineKeyboardButton("✅Obuna bo'ldim", callback_data="check"))
 
     return join_inline
+
 
 async def LangsInline(user_id):
     user_in, user_out = await UserLangs(user_id)
@@ -46,9 +45,9 @@ async def LangsInline(user_id):
             Nout = "✅"
         langs_inline.add(InlineKeyboardButton(Nin+lang_in, callback_data=lang_in))
         langs_inline.insert(InlineKeyboardButton(Nout+lang_out, callback_data=lang_out))
-    TTS = "☑️"
     if tts:
         TTS = "✅"
+    else: TTS = "☑️"
     langs_inline.add(InlineKeyboardButton(TTS+"TTS", callback_data="TTS"))
 
     return langs_inline

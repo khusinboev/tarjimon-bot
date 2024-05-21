@@ -1,12 +1,11 @@
 from asyncio import exceptions
-
 from aiogram import types
-from aiogram.types import CallbackQuery, ChatActions
+from aiogram.types import CallbackQuery, ChatActions, InlineKeyboardButton
 from deep_translator import GoogleTranslator
 from gtts import gTTS
 from aiogram.utils import exceptions
 from buttons.mButtons import JoinBtn, LangsInline
-from config import dp, bot, adminPanel, sql, TOKEN, adminStart
+from config import dp, bot, adminPanel, sql, adminStart, db
 from databasa.functions import Auth_Function
 from function.functions import functions, UserCheckLang
 
@@ -29,6 +28,8 @@ async def change_lang(message: types.Message):
 
 @dp.message_handler(content_types="text", chat_type=types.ChatType.PRIVATE)
 async def translator(message: types.Message):
+    exchangeLang = types.InlineKeyboardMarkup().add(
+        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
     await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)
     await Auth_Function(message)
     user_id = message.from_user.id
@@ -53,11 +54,12 @@ async def translator(message: types.Message):
                     tts.save(f'Audios/{user_id}.mp3')
 
                     await message.answer_audio(audio=open(f'Audios/{user_id}.mp3', 'rb'),
-                                               caption=f"Tarjimasi: 👇\n\n<code>{trText}</code>", parse_mode="html")
+                                               caption=f"Tarjimasi: 👇\n\n<code>{trText}</code>", parse_mode="html",
+                                               reply_markup=exchangeLang)
                 except:
-                    await message.answer(text=f"<code>{trText}</code>", parse_mode="html")
+                    await message.answer(text=f"<code>{trText}</code>", parse_mode="html", reply_markup=exchangeLang)
             else:
-                await message.answer(text=f"<code>{trText}</code>", parse_mode="html")
+                await message.answer(text=f"<code>{trText}</code>", parse_mode="html", reply_markup=exchangeLang)
 
         else:
             await message.answer(
@@ -78,12 +80,12 @@ def CallFilter(all):
     lang_outs = [item[0] for item in lang_outs]
     lang_outs.append("TTS")
 
-    List = lang_ins + lang_outs
-    return List
+    return lang_ins + lang_outs
 
 
 @dp.callback_query_handler(chat_type=types.ChatType.PRIVATE)
 async def check(call: CallbackQuery):
+    user_id = call.from_user.id
     if call.data in CallFilter("all"):
         try:
             await call.answer()
@@ -91,10 +93,20 @@ async def check(call: CallbackQuery):
             pass
         await UserCheckLang(call)
         try:
-            await call.message.edit_reply_markup(await LangsInline(call.from_user.id))
-        except Exception as ex:
-            await dp.bot.send_message(chat_id=adminStart, text=f"Error: \n\n{ex}")
-            await call.message.delete()
+            await call.message.edit_reply_markup(await LangsInline(user_id))
+        except exceptions.MessageNotModified or exceptions.MessageToEditNotFound:
+            pass
+        except Exception as e:
+            await dp.bot.send_message(chat_id=adminStart, text=f"Error in text tr: \n\n{e}")
+    elif call.data == "exchangeLang":
+        sql.execute(f"""select in_lang, out_lang from public.user_langs where user_id='{user_id}'""")
+        codes = sql.fetchall()[0]
+        await call.answer(f"{codes[1]} --> {codes[0]}")
+        sql.execute(f"""UPDATE public.user_langs SET out_lang = '{codes[0]}' WHERE user_id='{user_id}'""")
+        db.commit()
+        sql.execute(f"""UPDATE public.user_langs SET in_lang = '{codes[1]}' WHERE user_id='{user_id}'""")
+        db.commit()
+
     else:
         print(call.data)
 
