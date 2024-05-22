@@ -66,7 +66,7 @@ async def translator(message: types.Message):
                 "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
                 reply_markup=await JoinBtn(user_id))
     except Exception as ex:
-        await dp.bot.send_message(chat_id=adminStart, text=f"Error in text tr: \n\n{ex}")
+        await dp.bot.send_message(chat_id=adminStart, text=f"Error in translation: \n\n{ex}")
 
 
 def CallFilter(all):
@@ -97,7 +97,7 @@ async def check(call: CallbackQuery):
         except exceptions.MessageNotModified or exceptions.MessageToEditNotFound:
             pass
         except Exception as e:
-            await dp.bot.send_message(chat_id=adminStart, text=f"Error in text tr: \n\n{e}")
+            await dp.bot.send_message(chat_id=adminStart, text=f"Error in edite: \n\n{e}")
     elif call.data == "exchangeLang":
         sql.execute(f"""select in_lang, out_lang from public.user_langs where user_id='{user_id}'""")
         codes = sql.fetchall()[0]
