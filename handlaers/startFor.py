@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram.types import CallbackQuery, ChatActions
+from aiogram.utils import exceptions
 
 from buttons.mButtons import JoinBtn, LangsInline
 from config import sql, dp, bot, adminStart
@@ -40,6 +41,7 @@ async def check(call: CallbackQuery):
             await call.answer(show_alert=True,
                               text="Botimizdan foydalanish uchun kanalimizga azo bo'ling"
                                    "\nSubscribe to our channel to use our bot")
-    except Exception as ex:
-        await dp.bot.send_message(chat_id=adminStart, text=f"Error in check: \n\n{ex}")
+    except exceptions.MessageToDeleteNotFound:
         pass
+    except Exception as e:
+        await dp.bot.send_message(chat_id=adminStart, text=f"Error in check: \n\n{e}")
