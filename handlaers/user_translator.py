@@ -98,6 +98,8 @@ async def check(call: CallbackQuery):
             pass
         except exceptions.MessageToEditNotFound:
             pass
+        except exceptions.MessageIdInvalid:
+            pass
         except Exception as e:
             await dp.bot.send_message(chat_id=adminStart, text=f"Error in edit: \n\n{e}")
     elif call.data == "exchangeLang":
