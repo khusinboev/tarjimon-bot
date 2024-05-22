@@ -94,10 +94,12 @@ async def check(call: CallbackQuery):
         await UserCheckLang(call)
         try:
             await call.message.edit_reply_markup(await LangsInline(user_id))
-        except exceptions.MessageNotModified or exceptions.MessageToEditNotFound:
+        except exceptions.MessageNotModified:
+            pass
+        except exceptions.MessageToEditNotFound:
             pass
         except Exception as e:
-            await dp.bot.send_message(chat_id=adminStart, text=f"Error in edite: \n\n{e}")
+            await dp.bot.send_message(chat_id=adminStart, text=f"Error in edit: \n\n{e}")
     elif call.data == "exchangeLang":
         sql.execute(f"""select in_lang, out_lang from public.user_langs where user_id='{user_id}'""")
         codes = sql.fetchall()[0]
