@@ -128,6 +128,7 @@ async def check(call: CallbackQuery):
 
     else:
         print(call.data)
+        await dp.bot.send_message(chat_id=adminStart, text=f"Error in call query: \n\n{call.data}")
 
 
 # @dp.message_handler(content_types=types.ContentType.PHOTO, chat_type=types.ChatType.PRIVATE)
