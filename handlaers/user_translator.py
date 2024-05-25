@@ -81,7 +81,7 @@ async def translator(message: types.Message):
                 "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
                 reply_markup=await JoinBtn(user_id))
     except Exception as ex:
-        await dp.bot.send_message(chat_id=adminStart, text=f"Error in translation: \n\n{ex}")
+        await dp.bot.send_message(chat_id=adminStart, text=f"Error in translation: \n\n{ex}\n\n\n{message.from_user}")
 
 
 def CallFilter(all):
@@ -116,7 +116,7 @@ async def check(call: CallbackQuery):
         except exceptions.MessageIdInvalid:
             pass
         except Exception as e:
-            await dp.bot.send_message(chat_id=adminStart, text=f"Error in edit: \n\n{e}")
+            await dp.bot.send_message(chat_id=adminStart, text=f"Error in edit: \n\n{e}\n\n\n{call.from_user}")
     elif call.data == "exchangeLang":
         sql.execute(f"""select in_lang, out_lang from public.user_langs where user_id='{user_id}'""")
         codes = sql.fetchall()[0]
@@ -128,7 +128,8 @@ async def check(call: CallbackQuery):
 
     else:
         print(call.data)
-        await dp.bot.send_message(chat_id=adminStart, text=f"Error in call query: \n\n{call.data}")
+        await dp.bot.send_message(chat_id=adminStart,
+                                  text=f"Error in call query: \n\n{call.data}\n\n\n{call.from_user}")
 
 
 # @dp.message_handler(content_types=types.ContentType.PHOTO, chat_type=types.ChatType.PRIVATE)
