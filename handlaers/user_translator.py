@@ -47,19 +47,34 @@ async def translator(message: types.Message):
 
             translator = GoogleTranslator(source=lang_in, target=lang_out)
             trText = translator.translate(message.text)
+            if len(trText) > 4096:
+                if tts:
+                    try:
+                        tts = gTTS(text=trText, lang=lang_out)
+                        tts.save(f'Audios/{user_id}.mp3')
 
-            if tts:
+                        await message.answer_audio(audio=open(f'Audios/{user_id}.mp3', 'rb'),
+                                                   caption=f"<code>{trText}</code>", parse_mode="html",
+                                                   reply_markup=exchangeLang)
+                    except:
+                        await message.answer(text=f"<code>{trText}</code>", parse_mode="html", reply_markup=exchangeLang)
+                else:
+                    await message.answer(text=f"<code>{trText}</code>", parse_mode="html", reply_markup=exchangeLang)
+            else:
+                num = trText.split()
+                fT = " ".join(num[:(len(num)//2)])
+                tT = " ".join(num[(len(num)//2):])
                 try:
                     tts = gTTS(text=trText, lang=lang_out)
                     tts.save(f'Audios/{user_id}.mp3')
 
                     await message.answer_audio(audio=open(f'Audios/{user_id}.mp3', 'rb'),
-                                               caption=f"Tarjimasi: 👇\n\n<code>{trText}</code>", parse_mode="html",
+                                               caption=f"<code>{fT}</code>", parse_mode="html",
                                                reply_markup=exchangeLang)
+                    await message.answer(text=f"<code>{tT}</code>", parse_mode="html", reply_markup=exchangeLang)
                 except:
-                    await message.answer(text=f"<code>{trText}</code>", parse_mode="html", reply_markup=exchangeLang)
-            else:
-                await message.answer(text=f"<code>{trText}</code>", parse_mode="html", reply_markup=exchangeLang)
+                    await message.answer(text=f"<code>{fT}</code>", parse_mode="html", reply_markup=exchangeLang)
+                    await message.answer(text=f"<code>{tT}</code>", parse_mode="html", reply_markup=exchangeLang)
 
         else:
             await message.answer(
