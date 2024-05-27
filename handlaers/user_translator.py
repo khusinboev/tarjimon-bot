@@ -47,7 +47,9 @@ async def translator(message: types.Message):
 
             translator = GoogleTranslator(source=lang_in, target=lang_out)
             trText = translator.translate(message.text)
-            if len(trText) < 4096:
+            if trText is None:
+                await message.answer(text=message.text, reply_markup=exchangeLang)
+            elif len(trText) < 4096:
                 if tts:
                     try:
                         tts = gTTS(text=trText, lang=lang_out)
