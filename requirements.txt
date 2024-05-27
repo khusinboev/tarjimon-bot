@@ -3,3 +3,7 @@ deep-translator==1.11.4
 gTTS==2.3.2
 psycopg2==2.9.7
 pytz==2023.3
+python-dotenv==1.0.1
+requests==2.32.2
+beautifulsoup4==4.12.3
+aiohttp==3.8.6
