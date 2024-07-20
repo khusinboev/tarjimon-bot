@@ -193,6 +193,7 @@ async def photo_tr_jpg(message: types.Message):
                 reply_markup=await JoinBtn(user_id))
     except Exception as ex:
         await dp.bot.send_message(chat_id=adminStart, text=f"Error in translation: \n\n{ex}\n\n\n{message.from_user}")
+        await message.answer(text="Error. Check the your message and resend me")
 
     # loop = asyncio.get_running_loop()
     # loop.run_in_executor(None, lambda: asyncio.run(photo_tr(image_path=file_name,
