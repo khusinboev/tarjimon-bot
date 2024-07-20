@@ -145,7 +145,7 @@ async def photo_tr_jpg(message: types.Message):
             photo_file = await photo.get_file()
             await photo_file.download(destination_file=file_name)
 
-            pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
+            # pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
 
             # Rasmni ochish
             image = Image.open(file_name)
