@@ -209,7 +209,7 @@ async def text_translate(text, user_id):
     lang_out = sql.fetchone()[0]
 
     translator = GoogleTranslator(source=lang_in, target=lang_out)
-    trText = translator.translate(text)
+    trText = str(translator.translate(text))
 
     return lang_in, lang_out, trText
 
