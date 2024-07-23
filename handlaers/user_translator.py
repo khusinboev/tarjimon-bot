@@ -149,9 +149,9 @@ async def photo_tr_jpg(message: types.Message):
 
             # Rasmni ochish
             image = Image.open(file_name)
-
+            lang_tx = '''uzb+tur+tgk+eng+jpn+ita+rus+kor+ara+chi_sim+fra+deu+hin+aze+dar+kaz+tkm+kir+amh+ind'''
             # Rasmni OCR bilan o'qish
-            text = pytesseract.image_to_string(image)
+            text = pytesseract.image_to_string(image, lang=lang_tx)
             lang_in, lang_out, trText = await text_translate(text=text, user_id=user_id)
 
             sql.execute(f"""select tts from public.users_tts where user_id={user_id}""")

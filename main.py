@@ -8,10 +8,15 @@ from handlaers.user_translator import *
 from handlaers.group_translator import *
 
 from config import dp, adminStart
+import os
 
 
 async def on_startup(dp):
     await dp.bot.send_message(chat_id=adminStart, text="Successful. Bot started!")
+    if not os.path.exists("Audios"):
+        os.makedirs("Audios")
+    if not os.path.exists("photos"):
+        os.makedirs("photos")
     print(await bot.get_me())
     await CreateBasa()
 
