@@ -13,7 +13,8 @@ from PIL import Image
 import pytesseract
 import requests
 import json, platform
-from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import Process
+
 
 async def text_translate(text, user_id):
     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
@@ -156,8 +157,8 @@ async def photo_tr_jpg(message: types.Message):
     photo_file = await photo.get_file()
     await photo_file.download(destination_file=file_name)
 
-    task1 = asyncio.create_task(photo_tr(user_id=user_id, file_name=file_name, from_user=message.from_user.as_json()))
-    await task1
+    process1 = Process(target=photo_tr, args=(user_id, file_name, from_us, ))
+    process1.start()
     # loop = asyncio.get_event_loop()
     # await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), photo_tr, user_id, file_name, from_us)
 
@@ -166,7 +167,7 @@ async def photo_tr_jpg(message: types.Message):
     # await loop.run_in_executor(None, lambda: photo_tr(user_id, file_name, from_us))
 
 
-async def photo_tr(user_id, file_name, from_user):
+def photo_tr(user_id, file_name, from_user):
     msg_send = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     audio_send = f"https://api.telegram.org/bot{TOKEN}/sendAudio"
     photo_send = f"https://api.telegram.org/bot{TOKEN}/sendPhoto"
@@ -178,7 +179,7 @@ async def photo_tr(user_id, file_name, from_user):
         ]
     }
     try:
-        if await functions.check_on_start(user_id) or user_id in adminPanel:
+        if asyncio.run(functions.check_on_start(user_id) or user_id in adminPanel):
             if platform.system() == 'Windows':
                 pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
             # Rasmni ochish
@@ -187,7 +188,7 @@ async def photo_tr(user_id, file_name, from_user):
             # Rasmni OCR bilan o'qish
             text = pytesseract.image_to_string(image, lang=lang_tx)
             if text != '':
-                lang_in, lang_out, trText = await text_translate(text=text, user_id=user_id)
+                lang_in, lang_out, trText = asyncio.run(text_translate(text=text, user_id=user_id))
 
                 sql.execute(f"""select tts from public.users_tts where user_id={user_id}""")
                 tts = sql.fetchone()[0]
@@ -272,7 +273,7 @@ async def photo_tr(user_id, file_name, from_user):
             payload = {
                 'chat_id': user_id,
                 'text': "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
-                'reply_markup': json.dumps(await JoinBtn(user_id))
+                'reply_markup': json.dumps(asyncio.run(JoinBtn(user_id)))
             }
             requests.post(msg_send, data=payload)
     except Exception as ex:
