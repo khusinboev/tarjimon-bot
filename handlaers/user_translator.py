@@ -158,12 +158,11 @@ async def photo_tr_jpg(message: types.Message):
     # loop = asyncio.get_event_loop()
     # await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), photo_tr, user_id, file_name, from_us)
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    await loop.run_in_executor(None, lambda: photo_tr(user_id, file_name, from_us))
+    loop = asyncio.get_running_loop()
+    loop.run_in_executor(None, lambda: asyncio.run(photo_tr(user_id, file_name, from_us)))
 
 
-def photo_tr(user_id, file_name, from_user):
+async def photo_tr(user_id, file_name, from_user):
     msg_send = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     audio_send = f"https://api.telegram.org/bot{TOKEN}/sendAudio"
     photo_send = f"https://api.telegram.org/bot{TOKEN}/sendPhoto"
