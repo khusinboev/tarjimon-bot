@@ -175,6 +175,11 @@ async def photo_tr(user_id, file_name, from_user):
     }
     try:
         if await functions.check_on_start(user_id) or user_id in adminPanel:
+            payload = {
+                'chat_id': user_id,
+                'text': "Waiting!..."
+            }
+            requests.post(msg_send, data=payload)
             if platform.system() == 'Windows':
                 pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
             # Rasmni ochish
