@@ -13,6 +13,7 @@ from PIL import Image
 import pytesseract
 import requests
 import json, platform
+from multiprocessing import Process
 
 
 async def text_translate(text, user_id):
@@ -173,7 +174,7 @@ async def photo_tr(user_id, file_name, from_user):
         ]
     }
     try:
-        if asyncio.run(functions.check_on_start(user_id) or user_id in adminPanel):
+        if await functions.check_on_start(user_id) or user_id in adminPanel:
             if platform.system() == 'Windows':
                 pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
             # Rasmni ochish
@@ -182,7 +183,7 @@ async def photo_tr(user_id, file_name, from_user):
             # Rasmni OCR bilan o'qish
             text = pytesseract.image_to_string(image, lang=lang_tx)
             if text != '':
-                lang_in, lang_out, trText = asyncio.run(text_translate(text=text, user_id=user_id))
+                lang_in, lang_out, trText = await text_translate(text=text, user_id=user_id)
 
                 sql.execute(f"""select tts from public.users_tts where user_id={user_id}""")
                 tts = sql.fetchone()[0]
@@ -267,7 +268,7 @@ async def photo_tr(user_id, file_name, from_user):
             payload = {
                 'chat_id': user_id,
                 'text': "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
-                'reply_markup': json.dumps(asyncio.run(JoinBtn(user_id)))
+                'reply_markup': json.dumps(await JoinBtn(user_id))
             }
             requests.post(msg_send, data=payload)
     except Exception as ex:
