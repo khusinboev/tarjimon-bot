@@ -295,60 +295,24 @@ async def photo_tr(user_id, file_name, from_user):
         requests.post(msg_send, data=payload)
 
 
-# async def photo_tr(image_path, user_id, message: types.Message):
-#     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
-#     lang_in = sql.fetchone()[0]
-#     sql.execute(f"""select out_lang from public.user_langs where user_id={user_id}""")
-#     lang_out = sql.fetchone()[0]
-#     translater = GoogleTranslator(source=lang_in, target=lang_out)
-#
-#     img = cv2.imread(image_path)
-#     reader = easyocr.Reader([lang_in], gpu=False)
-#     text_ = reader.readtext(img)
-#     threshold = 0.25
-#     texts = ''
-#     res = True
-#     for t_, t in enumerate(text_):
-#         bbox, text, score = t
-#
-#         if score > threshold:
-#             texts += f"{text}\n"
-#
-#     res_text = "None"
-#     if res:
-#         plt.imsave(image_path, img)
-#         if len(texts) > 2:
-#             if lang_in == lang_out:
-#                 res_text = texts
-#             else:
-#                 res_text = translater.translate(texts)
-#
-#     else:
-#         if len(texts) > 2:
-#             if lang_in == lang_out:
-#                 res_text = texts
-#             else:
-#                 res_text = translater.translate(texts)
-#
-#     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-#     response = requests.post(url, data={'chat_id': user_id, 'text': res_text})
-#     content = response.content.decode("utf8")
-#     json.loads(content)
+@dp.message_handler(content_types=types.ContentType.VOICE, chat_type=types.ChatType.PRIVATE)
+async def photo_tr_other(message: types.Message):
+    pass
+    await message.answer("Waiting...")
+    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.UPLOAD_PHOTO)
+    document = message.document
+    file_name = f"photos/{message.from_user.id}.png"
+    document_file = await document.get_file()
+    await document_file.download(destination_file=file_name)
 
 
-# @dp.message_handler(content_types=types.ContentType.DOCUMENT, chat_type=types.ChatType.PRIVATE)
-# async def photo_tr_other(message: types.Message):
-#     pass
-#     await message.answer("Waiting...")
-#     await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.UPLOAD_PHOTO)
-#     document = message.document
-#     file_name = f"photos/{message.from_user.id}.png"
-#     document_file = await document.get_file()
-#     await document_file.download(destination_file=file_name)
-#
-#     loop = asyncio.get_running_loop()
-#     loop.run_in_executor(None, lambda: asyncio.run(photo_tr(image_path=file_name,
-#                                                             user_id=message.from_user.id,
-#                                                             message=message)))
-#
-#
+@dp.message_handler(content_types=types.ContentType.AUDIO, chat_type=types.ChatType.PRIVATE)
+async def photo_tr_other(message: types.Message):
+    pass
+    await message.answer("Waiting...")
+    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.UPLOAD_PHOTO)
+    document = message.document
+    file_name = f"photos/{message.from_user.id}.png"
+    document_file = await document.get_file()
+    await document_file.download(destination_file=file_name)
+
