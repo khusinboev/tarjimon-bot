@@ -158,8 +158,7 @@ async def photo_tr_jpg(message: types.Message):
     # loop = asyncio.get_event_loop()
     # await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), photo_tr, user_id, file_name, from_us)
 
-    loop = asyncio.get_running_loop()
-    loop.run_in_executor(None, lambda: asyncio.run(photo_tr(user_id, file_name, from_us)))
+    await photo_tr(user_id, file_name, from_us)
 
 
 async def photo_tr(user_id, file_name, from_user):
