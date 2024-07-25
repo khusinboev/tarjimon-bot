@@ -13,7 +13,6 @@ from PIL import Image
 import pytesseract
 import requests
 import json, platform
-from multiprocessing import Process
 
 
 async def text_translate(text, user_id):
@@ -156,14 +155,12 @@ async def photo_tr_jpg(message: types.Message):
     photo_file = await photo.get_file()
     await photo_file.download(destination_file=file_name)
 
-    process1 = Process(target=photo_tr, args=(user_id, file_name, from_us, ))
-    process1.start()
     # loop = asyncio.get_event_loop()
     # await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), photo_tr, user_id, file_name, from_us)
 
-    # loop = asyncio.new_event_loop()
-    # asyncio.set_event_loop(loop)
-    # await loop.run_in_executor(None, lambda: photo_tr(user_id, file_name, from_us))
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    await loop.run_in_executor(None, lambda: photo_tr(user_id, file_name, from_us))
 
 
 def photo_tr(user_id, file_name, from_user):
