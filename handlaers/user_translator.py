@@ -174,7 +174,7 @@ async def photo_tr(user_id, file_name, from_user):
     }
     try:
         if await functions.check_on_start(user_id) or user_id in adminPanel:
-            pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
+            # pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
             # Rasmni ochish
             image = Image.open(file_name)
             lang_tx = '''uzb+tur+tgk+eng+jpn+ita+rus+kor+ara+chi_sim+fra+deu+hin+aze+dar+kaz+tkm+kir+amh+ind'''
