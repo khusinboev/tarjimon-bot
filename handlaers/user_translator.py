@@ -148,6 +148,7 @@ async def check(call: CallbackQuery):
 async def photo_tr_jpg(message: types.Message):
     await Auth_Function(message)
     user_id = message.from_user.id
+    from_us = message.from_user.as_json()
 
     photo_name = message.photo[-1].file_id
     file_name = f"photos/{photo_name}.jpg"
@@ -158,11 +159,10 @@ async def photo_tr_jpg(message: types.Message):
     # await photo_tr(user_id=user_id, file_name=file_name, from_user=message.from_user.as_json())
     # await asyncio.create_task(photo_tr(user_id=user_id, file_name=file_name, from_user=message.from_user.as_json()))
     loop = asyncio.get_running_loop()
-    loop.run_in_executor(None, lambda: asyncio.run(photo_tr(user_id=user_id, file_name=file_name,
-                                                            from_user=message.from_user.as_json())))
+    await loop.run_in_executor(None, lambda: photo_tr(user_id, file_name, from_us))
 
 
-async def photo_tr(user_id, file_name, from_user):
+def photo_tr(user_id, file_name, from_user):
     msg_send = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     audio_send = f"https://api.telegram.org/bot{TOKEN}/sendAudio"
     photo_send = f"https://api.telegram.org/bot{TOKEN}/sendPhoto"
@@ -174,7 +174,7 @@ async def photo_tr(user_id, file_name, from_user):
         ]
     }
     try:
-        if await functions.check_on_start(user_id) or user_id in adminPanel:
+        if asyncio.run(functions.check_on_start(user_id) or user_id in adminPanel):
             # pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
             # Rasmni ochish
             image = Image.open(file_name)
@@ -182,7 +182,7 @@ async def photo_tr(user_id, file_name, from_user):
             # Rasmni OCR bilan o'qish
             text = pytesseract.image_to_string(image, lang=lang_tx)
             if text != '':
-                lang_in, lang_out, trText = await text_translate(text=text, user_id=user_id)
+                lang_in, lang_out, trText = asyncio.run(text_translate(text=text, user_id=user_id))
 
                 sql.execute(f"""select tts from public.users_tts where user_id={user_id}""")
                 tts = sql.fetchone()[0]
@@ -267,7 +267,7 @@ async def photo_tr(user_id, file_name, from_user):
             payload = {
                 'chat_id': user_id,
                 'text': "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
-                'reply_markup': json.dumps(await JoinBtn(user_id))
+                'reply_markup': json.dumps(asyncio.run(JoinBtn(user_id)))
             }
             requests.post(msg_send, data=payload)
     except Exception as ex:
