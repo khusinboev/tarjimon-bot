@@ -156,7 +156,7 @@ async def photo_tr_jpg(message: types.Message):
     photo_file = await photo.get_file()
     await photo_file.download(destination_file=file_name)
 
-    await asyncio.create_task(photo_tr(user_id=user_id, file_name=file_name, from_user=message.from_user.as_json()))
+    asyncio.create_task(photo_tr(user_id=user_id, file_name=file_name, from_user=message.from_user.as_json()))
 
     # loop = asyncio.get_event_loop()
     # await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), photo_tr, user_id, file_name, from_us)
