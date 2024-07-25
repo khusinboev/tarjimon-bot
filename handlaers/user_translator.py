@@ -12,8 +12,8 @@ from function.functions import functions, UserCheckLang
 from PIL import Image
 import pytesseract
 import requests
-import json
-
+import json, platform
+from concurrent.futures import ThreadPoolExecutor
 
 async def text_translate(text, user_id):
     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
@@ -158,8 +158,9 @@ async def photo_tr_jpg(message: types.Message):
 
     # await photo_tr(user_id=user_id, file_name=file_name, from_user=message.from_user.as_json())
 
-    task1 = await asyncio.create_task(photo_tr(user_id=user_id, file_name=file_name, from_user=message.from_user.as_json()))
-    await task1
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), photo_tr, user_id, file_name, from_us)
+
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # await loop.run_in_executor(None, lambda: photo_tr(user_id, file_name, from_us))
@@ -178,7 +179,8 @@ def photo_tr(user_id, file_name, from_user):
     }
     try:
         if asyncio.run(functions.check_on_start(user_id) or user_id in adminPanel):
-            # pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
+            if platform.system() == 'Windows':
+                pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
             # Rasmni ochish
             image = Image.open(file_name)
             lang_tx = '''uzb+tur+tgk+eng+jpn+ita+rus+kor+ara+chi_sim+fra+deu+hin+aze+dar+kaz+tkm+kir+amh+ind'''
