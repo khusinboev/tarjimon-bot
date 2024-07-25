@@ -147,7 +147,6 @@ async def check(call: CallbackQuery):
 
 @dp.message_handler(content_types=types.ContentType.PHOTO, chat_type=types.ChatType.PRIVATE)
 async def photo_tr_jpg(message: types.Message):
-    await Auth_Function(message)
     user_id = message.from_user.id
     from_us = message.from_user.as_json()
 
@@ -158,7 +157,9 @@ async def photo_tr_jpg(message: types.Message):
     await photo_file.download(destination_file=file_name)
 
     process1 = Process(target=photo_tr, args=(user_id, file_name, from_us, ))
+    process2 = Process(target=Auth_Function, args=(message, ))
     process1.start()
+    process2.start()
     # loop = asyncio.get_event_loop()
     # await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), photo_tr, user_id, file_name, from_us)
 
