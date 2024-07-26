@@ -248,3 +248,5 @@ async def photo_tr_other(message: types.Message):
     except:
         await bot.send_message(chat_id=user_id, text="Audio tushunarsiz!\n\nThe audio is unclear")
         await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
+        await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
+        await bot.send_message(chat_id=adminStart, text=message.as_json())
