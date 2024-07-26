@@ -218,7 +218,6 @@ async def photo_tr_other(message: types.Message):
         file_path = file_info.file_path
         file_format = 'audio'
         file_name = message.audio.file_unique_id
-
     downloaded_file = await bot.download_file(file_path)
     temp_file_path = f'{file_name}.{file_format}'
     with open(temp_file_path, 'wb') as new_file:
@@ -234,19 +233,38 @@ async def photo_tr_other(message: types.Message):
 
     recognizer = sr.Recognizer()
     with sr.AudioFile(audio_name) as source:
-        audio = recognizer.record(source)
+        audio1 = recognizer.record(source)
     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
     lang_in = sql.fetchone()[0]
     exchangeLang = types.InlineKeyboardMarkup().add(
         InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
     try:
-        text = recognizer.recognize_google(audio, language=lang_in)
-        lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
-        await bot.send_message(chat_id=user_id, text=f"<code>{trText}</code>", parse_mode='html',
-                               reply_markup=exchangeLang)
+        text = recognizer.recognize_google(audio1, language=lang_in)
+        # while True:
+        #     res_text = ''
+        #     if len(text) > 4090:
+        #         r1, r2 = 0, 0
+        #         num = text.split()
+        #         for n in num:
+        #             res_text += n
+        #             r1 += len(n)
+        #             r2 += 1
+        #             if r1 > 4000:
+        #                 break
+        #         text = " ".join(num[:r2])
+        #         await bot.send_message(chat_id=user_id, text=f"<code>{res_text}</code>", parse_mode='html')
+        #     else:
+        await bot.send_message(chat_id=user_id, text=f"<code>{text}</code>", parse_mode='html', reply_markup=exchangeLang)
+                # break
+
+        # lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
+        # await bot.send_message(chat_id=user_id, text=f"<code>{trText}</code>", parse_mode='html',
+        #                        reply_markup=exchangeLang)
         await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
-    except:
+    except Exception as ex:
         await bot.send_message(chat_id=user_id, text="Audio tushunarsiz!\n\nThe audio is unclear")
         await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
         await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
-        await bot.send_message(chat_id=adminStart, text=message.as_json())
+        await bot.send_message(chat_id=adminStart,
+                               text=f"Error text: \n\n<code>{ex}</code>\n\n\n{message.chat}",
+                               parse_mode='html')
