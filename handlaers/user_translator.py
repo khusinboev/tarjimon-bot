@@ -237,10 +237,13 @@ async def photo_tr_other(message: types.Message):
         audio = recognizer.record(source)
     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
     lang_in = sql.fetchone()[0]
+    exchangeLang = types.InlineKeyboardMarkup().add(
+        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
     try:
         text = recognizer.recognize_google(audio, language=lang_in)
         lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
-        await bot.send_message(chat_id=user_id, text=f"<code>{trText}</code>", parse_mode='html')
+        await bot.send_message(chat_id=user_id, text=f"<code>{trText}</code>", parse_mode='html',
+                               reply_markup=exchangeLang)
         await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
     except:
         await bot.send_message(chat_id=user_id, text="Audio tushunarsiz!\n\nThe audio is unclear")
