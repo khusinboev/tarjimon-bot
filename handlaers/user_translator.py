@@ -10,13 +10,10 @@ from config import dp, bot, adminPanel, sql, adminStart, db, TOKEN
 from databasa.functions import Auth_Function
 from function.functions import functions, UserCheckLang
 from PIL import Image
-import pytesseract
-import requests
-import json, platform
-from multiprocessing import Process
+import pytesseract, platform, threading, io
 
 
-async def text_translate(text, user_id):
+def text_translate(text, user_id):
     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
     lang_in = sql.fetchone()[0]
 
@@ -54,7 +51,7 @@ async def translator(message: types.Message):
     try:
         if await functions.check_on_start(message.chat.id) or user_id in adminPanel:
 
-            lang_in, lang_out, trText = await text_translate(text=message.text, user_id=user_id)
+            lang_in, lang_out, trText = text_translate(text=message.text, user_id=user_id)
 
             sql.execute(f"""select tts from public.users_tts where user_id={user_id}""")
             tts = sql.fetchone()[0]
@@ -150,149 +147,55 @@ async def photo_tr_jpg(message: types.Message):
     user_id = message.from_user.id
     from_us = message.from_user.as_json()
 
-    photo_name = message.photo[-1].file_id
-    file_name = f"photos/{photo_name}.jpg"
     photo = message.photo[-1]
-    photo_file = await photo.get_file()
-    await photo_file.download(destination_file=file_name)
+    photo_file = io.BytesIO()
+    await photo.download(destination_file=photo_file)
+    photo_file.seek(0)
+    image = Image.open(photo_file)
+    grayscale_image = image.convert("L")
+    file_id = photo.file_id
+    filename = f"photos/{file_id}.jpg"
+    with open(filename, 'wb') as output_file:
+        grayscale_image.save(output_file, format="JPEG")
 
-    # loop = asyncio.get_event_loop()
-    # await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), photo_tr, user_id, file_name, from_us)
-
-    await photo_tr(user_id, file_name, from_us)
+    await photo_tr(user_id, filename, from_us)
 
 
 async def photo_tr(user_id, file_name, from_user):
-    msg_send = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    audio_send = f"https://api.telegram.org/bot{TOKEN}/sendAudio"
-    photo_send = f"https://api.telegram.org/bot{TOKEN}/sendPhoto"
-    keyboard = {
-        'inline_keyboard': [
-            [
-                {'text': '🔄Exchange Languages', 'callback_data': 'exchangeLang'}
-            ]
-        ]
-    }
+    exchangeLang = types.InlineKeyboardMarkup().add(
+        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
     try:
         if await functions.check_on_start(user_id) or user_id in adminPanel:
-            payload = {
-                'chat_id': user_id,
-                'text': "Waiting!..."
-            }
-            requests.post(msg_send, data=payload)
+            await bot.send_message(chat_id=user_id, text="Waiting!...", reply_markup=exchangeLang)
             if platform.system() == 'Windows':
                 pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
-            # Rasmni ochish
+
             image = Image.open(file_name)
             lang_tx = '''uzb+tur+tgk+eng+jpn+ita+rus+kor+ara+chi_sim+fra+deu+hin+aze+dar+kaz+tkm+kir+amh+ind'''
-            # Rasmni OCR bilan o'qish
+
             text = pytesseract.image_to_string(image, lang=lang_tx)
             if text != '':
-                lang_in, lang_out, trText = await text_translate(text=text, user_id=user_id)
-
-                sql.execute(f"""select tts from public.users_tts where user_id={user_id}""")
-                tts = sql.fetchone()[0]
+                lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
                 if len(trText) < 4096:
-                    if tts:
-                        try:
-                            tts = gTTS(text=trText, lang=lang_out)
-                            tts.save(f'Audios/{user_id}.mp3')
-                            with open(f'Audios/{user_id}.mp3', 'rb') as audio_file:
-                                payload = {
-                                    'chat_id': user_id,
-                                    'caption': f"<code>{trText}</code>",
-                                    'parse_mode': 'html',
-                                    'reply_markup': json.dumps(keyboard)
-                                }
-                                files = {'audio': audio_file}
-                                requests.post(audio_send, data=payload, files=files)
-                        except:
-                            payload = {
-                                'chat_id': user_id,
-                                'text': f"<code>{trText}</code>",
-                                'parse_mode': 'html',
-                                'reply_markup': json.dumps(keyboard)
-                            }
-                            requests.post(msg_send, data=payload)
-                    else:
-                        payload = {
-                            'chat_id': user_id,
-                            'text': f"<code>{trText}</code>",
-                            'parse_mode': 'html',
-                            'reply_markup': json.dumps(keyboard)
-                        }
-                        requests.post(msg_send, data=payload)
+                    await bot.send_message(chat_id=user_id, text=str(trText), reply_markup=exchangeLang)
                 else:
                     num = trText.split()
                     fT = " ".join(num[:(len(num) // 2)])
                     tT = " ".join(num[(len(num) // 2):])
-                    try:
-                        tts = gTTS(text=trText, lang=lang_out)
-                        tts.save(f'Audios/{user_id}.mp3')
-                        with open(f'Audios/{user_id}.mp3', 'rb') as audio_file:
-                            payload = {
-                                'chat_id': user_id,
-                                'caption': f"<code>{fT}</code>"
-                            }
-                            files = {'audio': audio_file}
-                            requests.post(audio_send, data=payload, files=files)
-                        payload = {
-                            'chat_id': user_id,
-                            'text': f"<code>{tT}</code>",
-                            'parse_mode': 'html',
-                            'reply_markup': json.dumps(keyboard)
-                        }
-                        requests.post(msg_send, data=payload)
-                    except:
-                        payload = {
-                            'chat_id': user_id,
-                            'text': f"<code>{fT}</code>",
-                            'parse_mode': 'html',
-                            'reply_markup': json.dumps(keyboard)
-                        }
-                        requests.post(msg_send, data=payload)
-                        payload = {
-                            'chat_id': user_id,
-                            'text': f"<code>{tT}</code>",
-                            'parse_mode': 'html',
-                            'reply_markup': json.dumps(keyboard)
-                        }
-                        requests.post(msg_send, data=payload)
+                    await bot.send_message(chat_id=user_id, text=str(fT), reply_markup=exchangeLang)
+                    await bot.send_message(chat_id=user_id, text=str(tT), reply_markup=exchangeLang)
             else:
-                with open(file_name, 'rb') as photo_file:
-                    payload = {
-                        'chat_id': adminStart,
-                        'caption': from_user
-                    }
-                    files = {
-                        'photo': photo_file
-                    }
-                    requests.post(photo_send, data=payload, files=files)
+                await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'), caption=from_user)
 
         else:
-            payload = {
-                'chat_id': user_id,
-                'text': "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
-                'reply_markup': json.dumps(await JoinBtn(user_id))
-            }
-            requests.post(msg_send, data=payload)
+            await bot.send_message(chat_id=user_id,
+                                   text="Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
+                                   reply_markup=await JoinBtn(user_id))
     except Exception as ex:
-        with open(file_name, 'rb') as photo_file:
-            payload = {
-                'chat_id': adminStart,
-                'caption': f"Error in translation: \n\n{ex}\n\n\n{from_user}",
-                'reply_markup': json.dumps(keyboard)
-            }
-            files = {
-                'photo': photo_file
-            }
-            requests.post(photo_send, data=payload, files=files)
-
-        payload = {
-            'chat_id': user_id,
-            'text': f"Error. Check the your message and resend me"
-        }
-        requests.post(msg_send, data=payload)
+        await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'),
+                             caption=f"Error in translation: \n\n{ex}\n\n\n{from_user}")
+        await bot.send_message(chat_id=user_id, text="Error. Check the your message and resend me",
+                               reply_markup=exchangeLang)
 
 
 @dp.message_handler(content_types=types.ContentType.VOICE, chat_type=types.ChatType.PRIVATE)
