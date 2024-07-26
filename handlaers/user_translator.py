@@ -146,7 +146,6 @@ async def check(call: CallbackQuery):
 async def photo_tr_jpg(message: types.Message):
     user_id = message.from_user.id
     from_us = message.from_user.as_json()
-
     photo = message.photo[-1]
     photo_file = io.BytesIO()
     await photo.download(destination_file=photo_file)
@@ -190,7 +189,6 @@ async def photo_tr(user_id, file_name, from_user):
                 await bot.delete_message(chat_id=sent_message.chat.id, message_id=sent_message.message_id)
             except exceptions.MessageToDeleteNotFound:
                 pass
-
         else:
             await bot.send_message(chat_id=user_id,
                                    text="Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
