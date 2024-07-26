@@ -186,7 +186,10 @@ async def photo_tr(user_id, file_name, from_user):
                     await bot.send_message(chat_id=user_id, text=str(tT), reply_markup=exchangeLang)
             else:
                 await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'), caption=from_user)
-            await bot.delete_message(chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+            try:
+                await bot.delete_message(chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+            except exceptions.MessageToDeleteNotFound:
+                pass
 
         else:
             await bot.send_message(chat_id=user_id,
