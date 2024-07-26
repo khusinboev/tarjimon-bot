@@ -166,7 +166,7 @@ async def photo_tr(user_id, file_name, from_user):
         InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
     try:
         if await functions.check_on_start(user_id) or user_id in adminPanel:
-            await bot.send_message(chat_id=user_id, text="Waiting!...", reply_markup=exchangeLang)
+            sent_message = await bot.send_message(chat_id=user_id, text="Waiting!...", reply_markup=exchangeLang)
             if platform.system() == 'Windows':
                 pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
 
@@ -186,6 +186,7 @@ async def photo_tr(user_id, file_name, from_user):
                     await bot.send_message(chat_id=user_id, text=str(tT), reply_markup=exchangeLang)
             else:
                 await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'), caption=from_user)
+            await bot.delete_message(chat_id=sent_message.chat.id, message_id=sent_message.message_id)
 
         else:
             await bot.send_message(chat_id=user_id,
