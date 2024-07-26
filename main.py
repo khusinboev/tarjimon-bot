@@ -17,6 +17,8 @@ async def on_startup(dp):
         os.makedirs("Audios")
     if not os.path.exists("photos"):
         os.makedirs("photos")
+    if not os.path.exists("audio_tr"):
+        os.makedirs("audio_tr")
     print(await bot.get_me())
     await CreateBasa()
 
