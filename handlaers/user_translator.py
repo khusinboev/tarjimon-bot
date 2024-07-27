@@ -254,12 +254,12 @@ async def photo_tr_other(message: types.Message):
         #         text = " ".join(num[:r2])
         #         await bot.send_message(chat_id=user_id, text=f"<code>{res_text}</code>", parse_mode='html')
         #     else:
-        await bot.send_message(chat_id=user_id, text=f"<code>{text}</code>", parse_mode='html', reply_markup=exchangeLang)
+        # await bot.send_message(chat_id=user_id, text=f"<code>{text}</code>", parse_mode='html', reply_markup=exchangeLang)
                 # break
 
-        # lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
-        # await bot.send_message(chat_id=user_id, text=f"<code>{trText}</code>", parse_mode='html',
-        #                        reply_markup=exchangeLang)
+        lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
+        await bot.send_message(chat_id=user_id, text=f"<code>{trText}</code>", parse_mode='html',
+                               reply_markup=exchangeLang)
         await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
     except Exception as ex:
         await bot.send_message(chat_id=user_id, text="Audio tushunarsiz!\n\nThe audio is unclear")
