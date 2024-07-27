@@ -6,14 +6,14 @@ from aiogram.utils.exceptions import BotBlocked, ChatNotFound, RetryAfter, UserD
 
 from Statess.statess import From
 from buttons.mButtons import channel_btn, main_btn, reklama_btn
-from config import dp, bot, sql, db, adminPanel
+from config import dp, bot, sql, db, adminPanel, adminStart
 from function.functions import panel_func, forward_send_msg, send_message_chats
 
 
 @dp.message_handler(commands=["developer", 'coder', 'programmer'], chat_type=types.ChatType.PRIVATE)
 async def coder(msg: types.Message):
     await bot.send_chat_action(chat_id=msg.from_user.id, action=ChatActions.TYPING)
-    await msg.reply("Bot dasturchisi @coder_admin_py\n\nPowered by @coder_admin_py", parse_mode='html')
+    await msg.reply("Bot dasturchisi @adkhambek_4\n\nPowered by @adkhambek_4", parse_mode='html')
 
 
 markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -147,10 +147,9 @@ async def all_users2(message: types.Message, state: FSMContext):
     rows = sql.fetchall()
     num = 0
     for row in rows:
-        if await forward_send_msg(from_chat_id=message.chat.id, message_id=message.message_id, chat_id=row[0]):
-            num += 1
+        num += await forward_send_msg(from_chat_id=message.chat.id, message_id=message.message_id, chat_id=row[0])
 
-    await message.answer(text=f"Xabar yuborish yakunlandi, xabaringiz {num} ta odamga yuborildi",
+    await bot.send_message(chat_id=adminStart, text=f"Xabar yuborish yakunlandi, xabaringiz {num} ta odamga yuborildi",
                          reply_markup=reklama_btn)
 
 
@@ -170,8 +169,7 @@ async def all_users2(message: types.Message, state: FSMContext):
     rows = sql.fetchall()
     num = 0
     for row in rows:
-        if await send_message_chats(from_chat_id=message.chat.id, message_id=message.message_id, chat_id=row[0]):
-            num += 1
+        num += await send_message_chats(from_chat_id=message.chat.id, message_id=message.message_id, chat_id=row[0])
 
     await message.answer(text=f"Xabar yuborish yakunlandi, xabaringiz {num} ta odamga yuborildi",
                          reply_markup=reklama_btn)

@@ -50,9 +50,10 @@ class panel_func:
         return str
 
 
-async def forward_send_msg(chat_id: int, from_chat_id: int, message_id: int) -> bool:
+async def forward_send_msg(chat_id: int, from_chat_id: int, message_id: int) -> int:
     try:
         await dp.bot.forward_message(chat_id=chat_id, from_chat_id=from_chat_id, message_id=message_id)
+        return 1
     except exceptions.BotBlocked:
         pass
     except exceptions.ChatNotFound:
@@ -61,14 +62,15 @@ async def forward_send_msg(chat_id: int, from_chat_id: int, message_id: int) -> 
         pass
     except exceptions.TelegramAPIError:
         pass
-    else:
-        return True
-    return False
+    except Exception as e:
+        print(e)
+    return 0
 
 
-async def send_message_chats(chat_id: int, from_chat_id: int, message_id: int) -> bool:
+async def send_message_chats(chat_id: int, from_chat_id: int, message_id: int) -> int:
     try:
         await dp.bot.copy_message(chat_id=chat_id, from_chat_id=from_chat_id, message_id=message_id)
+        return 1
     except exceptions.BotBlocked:
         pass
     except exceptions.ChatNotFound:
@@ -77,9 +79,9 @@ async def send_message_chats(chat_id: int, from_chat_id: int, message_id: int) -
         pass
     except exceptions.TelegramAPIError:
         pass
-    else:
-        return True
-    return False
+    except Exception as e:
+        print(e)
+    return 0
 
 
 async def LangList():
