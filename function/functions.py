@@ -11,8 +11,8 @@ class functions:
         rows = sql.fetchall()
         error_code = 0
         for row in rows:
-            print(row)
-            print(row[0])
+            # print(row)
+            # print(row[0])
             r = await dp.bot.get_chat_member(chat_id=row[0], user_id=user_id)
             if r.status in ['member', 'creator', 'admin'] or user_id in adminPanel:
                 pass
