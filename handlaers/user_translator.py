@@ -44,12 +44,12 @@ async def change_lang(message: types.Message):
 
 @dp.message_handler(content_types="text", chat_type=types.ChatType.PRIVATE)
 async def translator(message: types.Message):
-    exchangeLang = types.InlineKeyboardMarkup().add(
-        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
-    await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)
-    await Auth_Function(message)
-    user_id = message.from_user.id
-    try:
+        exchangeLang = types.InlineKeyboardMarkup().add(
+            InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
+        await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)
+        await Auth_Function(message)
+        user_id = message.from_user.id
+    # try:
         if await functions.check_on_start(message.chat.id) or user_id in adminPanel:
 
             lang_in, lang_out, trText = text_translate(text=message.text, user_id=user_id)
@@ -91,8 +91,8 @@ async def translator(message: types.Message):
             await message.answer(
                 "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
                 reply_markup=await JoinBtn(user_id))
-    except Exception as ex:
-        await dp.bot.send_message(chat_id=adminStart, text=f"Error in translation: \n\n{ex}\n\n\n{message.from_user}")
+    # except Exception as ex:
+    #     await dp.bot.send_message(chat_id=adminStart, text=f"Error in translation: \n\n{ex}\n\n\n{message.from_user}")
 
 
 def CallFilter(all):
