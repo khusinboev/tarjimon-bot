@@ -25,6 +25,7 @@ async def welcome(message: types.Message):
                                       "\nSubscribe to our channel to use our bot",
                                  reply_markup=await JoinBtn(user_id))
     except Exception as ex:
+        await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
         await dp.bot.send_message(chat_id=adminStart, text=f"Error in start: \n\n{ex}")
         pass
 
@@ -44,4 +45,5 @@ async def check(call: CallbackQuery):
     except exceptions.MessageToDeleteNotFound:
         pass
     except Exception as e:
+        await bot.forward_message(chat_id=adminStart, from_chat_id=call.message.chat.id, message_id=call.message.message_id)
         await dp.bot.send_message(chat_id=adminStart, text=f"Error in check: \n\n{e}")

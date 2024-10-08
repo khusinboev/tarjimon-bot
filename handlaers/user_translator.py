@@ -92,6 +92,7 @@ async def translator(message: types.Message):
                 "Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
                 reply_markup=await JoinBtn(user_id))
     except Exception as ex:
+        await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
         await dp.bot.send_message(chat_id=adminStart, text=f"Error in translation: \n\n{ex}\n\n\n{message.from_user}")
 
 
@@ -159,10 +160,10 @@ async def photo_tr_jpg(message: types.Message):
     with open(filename, 'wb') as output_file:
         grayscale_image.save(output_file, format="JPEG")
 
-    await photo_tr(user_id, filename, from_us)
+    await photo_tr(user_id, filename, from_us, message)
 
 
-async def photo_tr(user_id, file_name, from_user):
+async def photo_tr(user_id, file_name, from_user, message):
     exchangeLang = types.InlineKeyboardMarkup().add(
         InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
     try:
@@ -196,6 +197,7 @@ async def photo_tr(user_id, file_name, from_user):
                                    text="Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
                                    reply_markup=await JoinBtn(user_id))
     except Exception as ex:
+        await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
         await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'),
                              caption=f"Error in translation: \n\n{ex}\n\n\n{from_user}")
         await bot.send_message(chat_id=user_id, text="Error. Check the your message and resend me",
