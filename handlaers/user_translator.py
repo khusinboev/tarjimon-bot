@@ -1,6 +1,6 @@
 from asyncio import exceptions
 from aiogram import types
-from aiogram.types import CallbackQuery, ChatActions, InlineKeyboardButton, ParseMode
+from aiogram.types import CallbackQuery, ChatActions, InlineKeyboardButton, ParseMode, WebAppInfo, InlineKeyboardMarkup
 from deep_translator import GoogleTranslator
 from gtts import gTTS
 from aiogram.utils import exceptions
@@ -152,9 +152,10 @@ async def check(call: CallbackQuery):
 
 @dp.message_handler(content_types=types.ContentType.PHOTO, chat_type=types.ChatType.PRIVATE)
 async def photo_tr_jpg(message: types.Message):
-    await bot.send_message(chat_id=message.from_user.id,
-                           text="try the [WEB](https://translate.google.com/?hl=en&tab=TT&sl=en&tl=uz&op=images)",
-                           parse_mode=ParseMode.MARKDOWN)
+    web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&tab=TT&sl=en&tl=uz&op=images")
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton(text="WEB", web_app=web_app_info))
+    await message.answer("Try the WEB👇", reply_markup=keyboard)
     # user_id = message.from_user.id
     # from_us = message.from_user.as_json()
     # photo = message.photo[-1]
@@ -215,9 +216,10 @@ async def photo_tr(user_id, file_name, from_user, message):
 
 @dp.message_handler(content_types=[types.ContentType.VOICE, types.ContentType.AUDIO], chat_type=types.ChatType.PRIVATE)
 async def photo_tr_other(message: types.Message):
-    await bot.send_message(chat_id=message.from_user.id,
-                           text="try the [WEB](https://translate.google.com/?hl=en&sl=uz&tl=en&op=translate)",
-                           parse_mode=ParseMode.MARKDOWN)
+    web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&tab=TT&sl=en&tl=uz&op=images")
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton(text="WEB", web_app=web_app_info))
+    await message.answer("Try the WEB👇", reply_markup=keyboard)
     # user_id = message.from_user.id
     # sent_msg = await bot.send_message(chat_id=user_id,
     #                                   text="Bu jarayon ko'proq vaqt olishi mumkin, kuting...\nWaiting e few second...")
