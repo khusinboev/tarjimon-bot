@@ -45,7 +45,9 @@ async def change_lang(message: types.Message):
 @dp.message_handler(content_types="text", chat_type=types.ChatType.PRIVATE)
 async def translator(message: types.Message):
     exchangeLang = types.InlineKeyboardMarkup().add(
-        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
+        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"),
+        InlineKeyboardButton(text="👅Langs", callback_data="lang_list"))
+
     await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)
     await Auth_Function(message)
     user_id = message.from_user.id
@@ -137,7 +139,14 @@ async def check(call: CallbackQuery):
         db.commit()
         sql.execute(f"""UPDATE public.user_langs SET in_lang = '{codes[1]}' WHERE user_id='{user_id}'""")
         db.commit()
-
+    elif call.data == "lang_list":
+        sql.execute(f"""select in_lang, out_lang from public.user_langs where user_id='{user_id}'""")
+        codes = sql.fetchall()[0]
+        await call.answer(f"{codes[1]} --> {codes[0]}")
+        sql.execute(f"""UPDATE public.user_langs SET out_lang = '{codes[0]}' WHERE user_id='{user_id}'""")
+        db.commit()
+        sql.execute(f"""UPDATE public.user_langs SET in_lang = '{codes[1]}' WHERE user_id='{user_id}'""")
+        db.commit()
     else:
         print(call.data)
         await dp.bot.send_message(chat_id=adminStart,
@@ -165,7 +174,8 @@ async def photo_tr_jpg(message: types.Message):
 
 async def photo_tr(user_id, file_name, from_user, message):
     exchangeLang = types.InlineKeyboardMarkup().add(
-        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
+        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"),
+        InlineKeyboardButton(text="👅Langs", callback_data="lang_list"))
     try:
         if await functions.check_on_start(user_id) or user_id in adminPanel:
             sent_message = await bot.send_message(chat_id=user_id, text="Waiting!...", reply_markup=exchangeLang)
@@ -241,7 +251,8 @@ async def photo_tr_other(message: types.Message):
     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
     lang_in = sql.fetchone()[0]
     exchangeLang = types.InlineKeyboardMarkup().add(
-        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"))
+        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"),
+        InlineKeyboardButton(text="👅Langs", callback_data="lang_list"))
     try:
         text = recognizer.recognize_google(audio1, language=lang_in)
         # while True:
