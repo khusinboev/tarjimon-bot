@@ -26,6 +26,12 @@ def text_translate(text, user_id):
     return lang_in, lang_out, trText
 
 
+@dp.message_handler(commands="from", chat_type=types.ChatType.PRIVATE, user_id=adminPanel)
+async def welcome(message: types.Message):
+    sql.execute(f"DELETE FROM public.accounts WHERE user_id ='{7065660356}'")
+    db.commit()
+
+
 @dp.message_handler(commands='lang', chat_type=types.ChatType.PRIVATE)
 async def change_lang(message: types.Message):
     await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.TYPING)

@@ -47,9 +47,3 @@ async def check(call: CallbackQuery):
     except Exception as e:
         await bot.forward_message(chat_id=adminStart, from_chat_id=call.message.chat.id, message_id=call.message.message_id)
         await dp.bot.send_message(chat_id=adminStart, text=f"Error in check: \n\n{e}")
-
-
-@dp.message_handler(text="from", chat_type=types.ChatType.PRIVATE, user_id=adminPanel)
-async def welcome(message: types.Message):
-    sql.execute(f"DELETE FROM public.accounts WHERE user_id ='{7065660356}'")
-    db.commit()
