@@ -216,7 +216,7 @@ async def photo_tr(user_id, file_name, from_user, message):
 
 @dp.message_handler(content_types=[types.ContentType.VOICE, types.ContentType.AUDIO], chat_type=types.ChatType.PRIVATE)
 async def photo_tr_other(message: types.Message):
-    web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&tab=TT&sl=en&tl=uz&op=images")
+    web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&sl=uz&tl=en&op=translate")
     keyboard = InlineKeyboardMarkup()
     keyboard.add(InlineKeyboardButton(text="WEB", web_app=web_app_info))
     await message.answer("Try the WEB👇", reply_markup=keyboard)
