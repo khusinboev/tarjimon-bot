@@ -30,6 +30,12 @@ def text_translate(text, user_id):
 async def welcome(message: types.Message):
     sql.execute(f"DELETE FROM public.accounts WHERE user_id ='{7065660356}'")
     db.commit()
+    sql.execute(f"DELETE FROM public.user_langs WHERE user_id ='{7065660356}'")
+    db.commit()
+    sql.execute(f"DELETE FROM public.users_status WHERE user_id ='{7065660356}'")
+    db.commit()
+    sql.execute(f"DELETE FROM public.users_tts WHERE user_id ='{7065660356}'")
+    db.commit()
 
 
 @dp.message_handler(commands='lang', chat_type=types.ChatType.PRIVATE)
