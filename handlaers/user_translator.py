@@ -140,6 +140,7 @@ async def check(call: CallbackQuery):
         sql.execute(f"""UPDATE public.user_langs SET in_lang = '{codes[1]}' WHERE user_id='{user_id}'""")
         db.commit()
     elif call.data == "lang_list":
+        await call.answer()
         await bot.send_chat_action(chat_id=call.message.from_user.id, action=ChatActions.TYPING)
         await Auth_Function(call.message)
         await call.message.answer("Choose languages", reply_markup=await LangsInline(call.message.from_user.id))
