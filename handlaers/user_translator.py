@@ -28,14 +28,19 @@ def text_translate(text, user_id):
 
 @dp.message_handler(commands="from", chat_type=types.ChatType.PRIVATE, user_id=adminPanel)
 async def welcome(message: types.Message):
-    sql.execute(f"DELETE FROM public.accounts WHERE user_id ='{7065660356}'")
-    db.commit()
-    sql.execute(f"DELETE FROM public.user_langs WHERE user_id ='{7065660356}'")
-    db.commit()
-    sql.execute(f"DELETE FROM public.users_status WHERE user_id ='{7065660356}'")
-    db.commit()
-    sql.execute(f"DELETE FROM public.users_tts WHERE user_id ='{7065660356}'")
-    db.commit()
+    user_id = message.text[6:]
+    if user_id.isdigit():
+        sql.execute(f"DELETE FROM public.accounts WHERE user_id ='{user_id}'")
+        db.commit()
+        sql.execute(f"DELETE FROM public.user_langs WHERE user_id ='{user_id}'")
+        db.commit()
+        sql.execute(f"DELETE FROM public.users_status WHERE user_id ='{user_id}'")
+        db.commit()
+        sql.execute(f"DELETE FROM public.users_tts WHERE user_id ='{user_id}'")
+        db.commit()
+        await message.answer(f"o'chirildi, {user_id}")
+    else:
+        await message.answer("xato")
 
 
 @dp.message_handler(commands='lang', chat_type=types.ChatType.PRIVATE)

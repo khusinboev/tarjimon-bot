@@ -216,7 +216,15 @@ async def Auth_Function(message):
     sql.execute(f"""SELECT user_id FROM accounts WHERE user_id = {user_id}""")
     check = sql.fetchone()
     if check == None:
-        sana = datetime.datetime.now(pytz.timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')
+        sql.execute(f"DELETE FROM public.accounts WHERE user_id ='{user_id}'")
+        db.commit()
+        sql.execute(f"DELETE FROM public.user_langs WHERE user_id ='{user_id}'")
+        db.commit()
+        sql.execute(f"DELETE FROM public.users_status WHERE user_id ='{user_id}'")
+        db.commit()
+        sql.execute(f"DELETE FROM public.users_tts WHERE user_id ='{user_id}'")
+        db.commit()
+        # sana = datetime.datetime.now(pytz.timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')
         sql.execute(
             f"""INSERT INTO accounts (user_id, username, lang_code) VALUES ('{user_id}', '{username}', '{lang_code}')""")
         db.commit()
