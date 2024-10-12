@@ -206,7 +206,8 @@ async def clear1(message: types.Message, state: FSMContext):
         for row in rows:
             id = row[0]
             try:
-                await dp.bot.send_message(chat_id=id, text="thanks")
+                sent_msg = await dp.bot.send_message(chat_id=id, text="thanks")
+                await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
             except BotBlocked:
                 sql.execute(f"DELETE FROM public.accounts WHERE user_id ='{id}'")
                 db.commit()
