@@ -233,73 +233,73 @@ async def photo_tr(user_id, file_name, from_user, message):
 
 @dp.message_handler(content_types=[types.ContentType.VOICE, types.ContentType.AUDIO], chat_type=types.ChatType.PRIVATE)
 async def photo_tr_other(message: types.Message):
-    web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&sl=uz&tl=en&op=translate")
-    keyboard = InlineKeyboardMarkup()
-    keyboard.add(InlineKeyboardButton(text="WEB", web_app=web_app_info))
-    await message.answer("Try the WEB👇", reply_markup=keyboard)
-    # user_id = message.from_user.id
-    # sent_msg = await bot.send_message(chat_id=user_id,
-    #                                   text="Bu jarayon ko'proq vaqt olishi mumkin, kuting...\nWaiting e few second...")
-    # if message.voice:
-    #     file_id = message.voice.file_id
-    #     file_info = await bot.get_file(file_id)
-    #     file_path = file_info.file_path
-    #     file_format = 'voice'
-    #     file_name = message.voice.file_unique_id
-    # elif message.audio:
-    #     file_id = message.audio.file_id
-    #     file_info = await bot.get_file(file_id)
-    #     file_path = file_info.file_path
-    #     file_format = 'audio'
-    #     file_name = message.audio.file_unique_id
-    # downloaded_file = await bot.download_file(file_path)
-    # temp_file_path = f'{file_name}.{file_format}'
-    # with open(temp_file_path, 'wb') as new_file:
-    #     new_file.write(downloaded_file.read())
-    # if file_format == 'voice':
-    #     audio = AudioSegment.from_ogg(temp_file_path)
-    # elif file_format == 'audio':
-    #     audio = AudioSegment.from_file(temp_file_path)
-    #
-    # audio_name = f'audio_tr/{file_name}.wav'
-    # audio.export(audio_name, format='wav')
-    # os.remove(temp_file_path)
-    #
-    # recognizer = sr.Recognizer()
-    # with sr.AudioFile(audio_name) as source:
-    #     audio1 = recognizer.record(source)
-    # sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
-    # lang_in = sql.fetchone()[0]
-    # exchangeLang = types.InlineKeyboardMarkup().add(
-    #     InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"),
-    #     InlineKeyboardButton(text="👅Langs", callback_data="lang_list"))
-    # try:
-    #     text = recognizer.recognize_google(audio1, language=lang_in)
-    #     # while True:
-    #     #     res_text = ''
-    #     #     if len(text) > 4090:
-    #     #         r1, r2 = 0, 0
-    #     #         num = text.split()
-    #     #         for n in num:
-    #     #             res_text += n
-    #     #             r1 += len(n)
-    #     #             r2 += 1
-    #     #             if r1 > 4000:
-    #     #                 break
-    #     #         text = " ".join(num[:r2])
-    #     #         await bot.send_message(chat_id=user_id, text=f"<code>{res_text}</code>", parse_mode='html')
-    #     #     else:
-    #     # await bot.send_message(chat_id=user_id, text=f"<code>{text}</code>", parse_mode='html', reply_markup=exchangeLang)
-    #             # break
-    #
-    #     lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
-    #     await bot.send_message(chat_id=user_id, text=f"<code>{trText}</code>", parse_mode='html',
-    #                            reply_markup=exchangeLang)
-    #     await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
-    # except Exception as ex:
-    #     await bot.send_message(chat_id=user_id, text="Audio tushunarsiz!\n\nThe audio is unclear")
-    #     await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
-    #     await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
-    #     await bot.send_message(chat_id=adminStart,
-    #                            text=f"Error text: \n\n<code>{ex}</code>\n\n\n{message.chat}",
-    #                            parse_mode='html')
+    # web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&sl=uz&tl=en&op=translate")
+    # keyboard = InlineKeyboardMarkup()
+    # keyboard.add(InlineKeyboardButton(text="WEB", web_app=web_app_info))
+    # await message.answer("Try the WEB👇", reply_markup=keyboard)
+    user_id = message.from_user.id
+    sent_msg = await bot.send_message(chat_id=user_id,
+                                      text="Bu jarayon ko'proq vaqt olishi mumkin, kuting...\nWaiting e few second...")
+    if message.voice:
+        file_id = message.voice.file_id
+        file_info = await bot.get_file(file_id)
+        file_path = file_info.file_path
+        file_format = 'voice'
+        file_name = message.voice.file_unique_id
+    elif message.audio:
+        file_id = message.audio.file_id
+        file_info = await bot.get_file(file_id)
+        file_path = file_info.file_path
+        file_format = 'audio'
+        file_name = message.audio.file_unique_id
+    downloaded_file = await bot.download_file(file_path)
+    temp_file_path = f'{file_name}.{file_format}'
+    with open(temp_file_path, 'wb') as new_file:
+        new_file.write(downloaded_file.read())
+    if file_format == 'voice':
+        audio = AudioSegment.from_ogg(temp_file_path)
+    elif file_format == 'audio':
+        audio = AudioSegment.from_file(temp_file_path)
+
+    audio_name = f'audio_tr/{file_name}.wav'
+    audio.export(audio_name, format='wav')
+    os.remove(temp_file_path)
+
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(audio_name) as source:
+        audio1 = recognizer.record(source)
+    sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
+    lang_in = sql.fetchone()[0]
+    exchangeLang = types.InlineKeyboardMarkup().add(
+        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"),
+        InlineKeyboardButton(text="👅Langs", callback_data="lang_list"))
+    try:
+        text = recognizer.recognize_google(audio1, language=lang_in)
+        # while True:
+        #     res_text = ''
+        #     if len(text) > 4090:
+        #         r1, r2 = 0, 0
+        #         num = text.split()
+        #         for n in num:
+        #             res_text += n
+        #             r1 += len(n)
+        #             r2 += 1
+        #             if r1 > 4000:
+        #                 break
+        #         text = " ".join(num[:r2])
+        #         await bot.send_message(chat_id=user_id, text=f"<code>{res_text}</code>", parse_mode='html')
+        #     else:
+        # await bot.send_message(chat_id=user_id, text=f"<code>{text}</code>", parse_mode='html', reply_markup=exchangeLang)
+                # break
+
+        lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
+        await bot.send_message(chat_id=user_id, text=f"<code>{trText}</code>", parse_mode='html',
+                               reply_markup=exchangeLang)
+        await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
+    except Exception as ex:
+        await bot.send_message(chat_id=user_id, text="Audio tushunarsiz!\n\nThe audio is unclear")
+        await bot.delete_message(chat_id=sent_msg.chat.id, message_id=sent_msg.message_id)
+        await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
+        await bot.send_message(chat_id=adminStart,
+                               text=f"Error text: \n\n<code>{ex}</code>\n\n\n{message.chat}",
+                               parse_mode='html')
