@@ -167,12 +167,12 @@ async def check(call: CallbackQuery):
                                   text=f"Error in call query: \n\n{call.data}\n\n\n{call.from_user}")
 
 
-# @dp.message_handler(content_types=types.ContentType.PHOTO, chat_type=types.ChatType.PRIVATE)
-# async def photo_tr_jpg(message: types.Message):
-#     web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&tab=TT&sl=en&tl=uz&op=images")
-#     keyboard = InlineKeyboardMarkup()
-#     keyboard.add(InlineKeyboardButton(text="WEB", web_app=web_app_info))
-#     await message.answer("Try the WEB👇", reply_markup=keyboard)
+@dp.message_handler(content_types=types.ContentType.PHOTO, chat_type=types.ChatType.PRIVATE)
+async def photo_tr_jpg(message: types.Message):
+    web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&tab=TT&sl=en&tl=uz&op=images")
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton(text="WEB", web_app=web_app_info))
+    await message.answer("Try the WEB👇", reply_markup=keyboard)
     # user_id = message.from_user.id
     # from_us = message.from_user.as_json()
     # photo = message.photo[-1]
