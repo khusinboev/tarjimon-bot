@@ -11,7 +11,7 @@ from function.functions import functions, UserCheckLang
 from PIL import Image
 from pydub import AudioSegment
 import speech_recognition as sr
-import pytesseract, platform, threading, io, asyncio, os
+import platform, threading, io, asyncio, os  # pytesseract 
 
 
 def text_translate(text, user_id):
