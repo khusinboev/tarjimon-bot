@@ -5,7 +5,7 @@ from deep_translator import GoogleTranslator
 from gtts import gTTS
 from aiogram.utils import exceptions
 from buttons.mButtons import JoinBtn, LangsInline
-from config import dp, bot, adminPanel, sql, adminStart, db, TOKEN
+from config import dp, bot, adminPanel, sql, adminStart, db, TOKEN, BASE_DIR
 from databasa.functions import Auth_Function
 from function.functions import functions, UserCheckLang
 from PIL import Image
@@ -54,7 +54,7 @@ async def change_lang(message: types.Message):
 async def change_lang(message: types.Message):
     await bot.send_chat_action(chat_id=message.from_user.id, action=ChatActions.UPLOAD_VIDEO)
     await Auth_Function(message)
-    await message.answer_video(video=open('video/useBot.mp4', 'rb'),
+    await message.answer_video(video=open(BASE_DIR + 'video/useBot.mp4', 'rb'),
                                caption="Botdan foydalanish uchun qo'llanma/Manual for using the bot\n\n\n"
                                        "For help admin: @coder_admin_py")
 
@@ -81,9 +81,9 @@ async def translator(message: types.Message):
                 if tts:
                     try:
                         tts = gTTS(text=trText, lang=lang_out)
-                        tts.save(f'Audios/{user_id}.mp3')
+                        tts.save(BASE_DIR + f'Audios/{user_id}.mp3')
 
-                        await message.answer_audio(audio=open(f'Audios/{user_id}.mp3', 'rb'),
+                        await message.answer_audio(audio=open(BASE_DIR + f'Audios/{user_id}.mp3', 'rb'),
                                                    caption=f"<code>{trText}</code>", parse_mode="html",
                                                    reply_markup=exchangeLang)
                     except:
@@ -98,7 +98,7 @@ async def translator(message: types.Message):
                     tts = gTTS(text=trText, lang=lang_out)
                     tts.save(f'Audios/{user_id}.mp3')
 
-                    await message.answer_audio(audio=open(f'Audios/{user_id}.mp3', 'rb'),
+                    await message.answer_audio(audio=open(BASE_DIR + f'Audios/{user_id}.mp3', 'rb'),
                                                caption=f"<code>{fT}</code>", parse_mode="html",
                                                reply_markup=exchangeLang)
                     await message.answer(text=f"<code>{tT}</code>", parse_mode="html", reply_markup=exchangeLang)
@@ -252,8 +252,8 @@ async def photo_tr_other(message: types.Message):
         file_path = file_info.file_path
         file_format = 'audio'
         file_name = message.audio.file_unique_id
-    downloaded_file = await bot.download_file(file_path)
-    temp_file_path = f'{file_name}.{file_format}'
+    downloaded_file = await bot.download_file(BASE_DIR + file_path)
+    temp_file_path = BASE_DIR + f'{file_name}.{file_format}'
     with open(temp_file_path, 'wb') as new_file:
         new_file.write(downloaded_file.read())
     if file_format == 'voice':
@@ -261,7 +261,7 @@ async def photo_tr_other(message: types.Message):
     elif file_format == 'audio':
         audio = AudioSegment.from_file(temp_file_path)
 
-    audio_name = f'audio_tr/{file_name}.wav'
+    audio_name = BASE_DIR + f'audio_tr/{file_name}.wav'
     audio.export(audio_name, format='wav')
     os.remove(temp_file_path)
 

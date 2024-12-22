@@ -7,18 +7,18 @@ from handlaers.admin_panel import *
 from handlaers.user_translator import *
 from handlaers.group_translator import *
 
-from config import dp, adminStart
+from config import dp, adminStart, BASE_DIR
 import os
 
 
 async def on_startup(dp):
     await dp.bot.send_message(chat_id=adminStart, text="Successful. Bot started!")
-    if not os.path.exists("Audios"):
-        os.makedirs("Audios")
-    if not os.path.exists("photos"):
-        os.makedirs("photos")
-    if not os.path.exists("audio_tr"):
-        os.makedirs("audio_tr")
+    if not os.path.exists(BASE_DIR + "Audios"):
+        os.makedirs(BASE_DIR + "Audios")
+    if not os.path.exists(BASE_DIR + "photos"):
+        os.makedirs(BASE_DIR + "photos")
+    if not os.path.exists(BASE_DIR + "audio_tr"):
+        os.makedirs(BASE_DIR + "audio_tr")
     print(await bot.get_me())
     await CreateBasa()
 
