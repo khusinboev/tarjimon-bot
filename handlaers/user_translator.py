@@ -11,7 +11,7 @@ from function.functions import functions, UserCheckLang
 from PIL import Image
 from pydub import AudioSegment
 import speech_recognition as sr
-import platform, threading, io, asyncio, os  # pytesseract 
+import platform, threading, io, asyncio, os#, pytesseract
 
 
 def text_translate(text, user_id):
@@ -189,46 +189,46 @@ async def photo_tr_jpg(message: types.Message):
     # await photo_tr(user_id, filename, from_us, message)
 
 
-async def photo_tr(user_id, file_name, from_user, message):
-    exchangeLang = types.InlineKeyboardMarkup().add(
-        InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"),
-        InlineKeyboardButton(text="👅Langs", callback_data="lang_list"))
-    try:
-        if await functions.check_on_start(user_id) or user_id in adminPanel:
-            sent_message = await bot.send_message(chat_id=user_id, text="Waiting!...", reply_markup=exchangeLang)
-            if platform.system() == 'Windows':
-                pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
-
-            image = Image.open(file_name)
-            lang_tx = '''uzb+tur+tgk+eng+jpn+ita+rus+kor+ara+chi_sim+fra+deu+hin+aze+dar+kaz+tkm+kir+amh+ind'''
-
-            text = pytesseract.image_to_string(image, lang=lang_tx)
-            if text != '':
-                lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
-                if len(trText) < 4096:
-                    await bot.send_message(chat_id=user_id, text=str(trText), reply_markup=exchangeLang)
-                else:
-                    num = trText.split()
-                    fT = " ".join(num[:(len(num) // 2)])
-                    tT = " ".join(num[(len(num) // 2):])
-                    await bot.send_message(chat_id=user_id, text=str(fT), reply_markup=exchangeLang)
-                    await bot.send_message(chat_id=user_id, text=str(tT), reply_markup=exchangeLang)
-            else:
-                await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'), caption=from_user)
-            try:
-                await bot.delete_message(chat_id=sent_message.chat.id, message_id=sent_message.message_id)
-            except exceptions.MessageToDeleteNotFound:
-                pass
-        else:
-            await bot.send_message(chat_id=user_id,
-                                   text="Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
-                                   reply_markup=await JoinBtn(user_id))
-    except Exception as ex:
-        await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
-        await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'),
-                             caption=f"Error in translation: \n\n{ex}\n\n\n{from_user}")
-        await bot.send_message(chat_id=user_id, text="Error. Check the your message and resend me",
-                               reply_markup=exchangeLang)
+# async def photo_tr(user_id, file_name, from_user, message):
+#     exchangeLang = types.InlineKeyboardMarkup().add(
+#         InlineKeyboardButton("🔄Exchange Languages", callback_data="exchangeLang"),
+#         InlineKeyboardButton(text="👅Langs", callback_data="lang_list"))
+#     try:
+#         if await functions.check_on_start(user_id) or user_id in adminPanel:
+#             sent_message = await bot.send_message(chat_id=user_id, text="Waiting!...", reply_markup=exchangeLang)
+#             if platform.system() == 'Windows':
+#                 pytesseract.pytesseract.tesseract_cmd = r'D:\Programs\tesserract\tesseract.exe'
+#
+#             image = Image.open(file_name)
+#             lang_tx = '''uzb+tur+tgk+eng+jpn+ita+rus+kor+ara+chi_sim+fra+deu+hin+aze+dar+kaz+tkm+kir+amh+ind'''
+#
+#             text = pytesseract.image_to_string(image, lang=lang_tx)
+#             if text != '':
+#                 lang_in, lang_out, trText = text_translate(text=text, user_id=user_id)
+#                 if len(trText) < 4096:
+#                     await bot.send_message(chat_id=user_id, text=str(trText), reply_markup=exchangeLang)
+#                 else:
+#                     num = trText.split()
+#                     fT = " ".join(num[:(len(num) // 2)])
+#                     tT = " ".join(num[(len(num) // 2):])
+#                     await bot.send_message(chat_id=user_id, text=str(fT), reply_markup=exchangeLang)
+#                     await bot.send_message(chat_id=user_id, text=str(tT), reply_markup=exchangeLang)
+#             else:
+#                 await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'), caption=from_user)
+#             try:
+#                 await bot.delete_message(chat_id=sent_message.chat.id, message_id=sent_message.message_id)
+#             except exceptions.MessageToDeleteNotFound:
+#                 pass
+#         else:
+#             await bot.send_message(chat_id=user_id,
+#                                    text="Botimizdan foydalanish uchun kanalimizga azo bo'ling\nSubscribe to our channel to use our bot",
+#                                    reply_markup=await JoinBtn(user_id))
+#     except Exception as ex:
+#         await bot.forward_message(chat_id=adminStart, from_chat_id=message.chat.id, message_id=message.message_id)
+#         await bot.send_photo(chat_id=adminStart, photo=open(file_name, 'rb'),
+#                              caption=f"Error in translation: \n\n{ex}\n\n\n{from_user}")
+#         await bot.send_message(chat_id=user_id, text="Error. Check the your message and resend me",
+#                                reply_markup=exchangeLang)
 
 
 @dp.message_handler(content_types=[types.ContentType.VOICE, types.ContentType.AUDIO], chat_type=types.ChatType.PRIVATE)
@@ -252,7 +252,7 @@ async def photo_tr_other(message: types.Message):
         file_path = file_info.file_path
         file_format = 'audio'
         file_name = message.audio.file_unique_id
-    downloaded_file = await bot.download_file(BASE_DIR + file_path)
+    downloaded_file = await bot.download_file(file_path)
     temp_file_path = BASE_DIR + f'{file_name}.{file_format}'
     with open(temp_file_path, 'wb') as new_file:
         new_file.write(downloaded_file.read())
