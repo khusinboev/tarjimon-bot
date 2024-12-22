@@ -252,8 +252,9 @@ async def audio_tr(message: types.Message):
         file_path = file_info.file_path
         file_format = 'audio'
         file_name = message.audio.file_unique_id
-    downloaded_file = await bot.download_file("audio_tr/"+file_path)
-    temp_file_path = audio_tr + f'{file_name}.{file_format}'
+    print(file_path)
+    downloaded_file = await bot.download_file(file_path)
+    temp_file_path = f'{file_name}.{file_format}'
     with open(temp_file_path, 'wb') as new_file:
         new_file.write(downloaded_file.read())
     if file_format == 'voice':
@@ -262,7 +263,7 @@ async def audio_tr(message: types.Message):
         print(temp_file_path)
         audio = AudioSegment.from_file(temp_file_path)
 
-    audio_name =  f'audio_tr/{file_name}.wav'
+    audio_name = f'audio_tr/{file_name}.wav'
     audio.export(audio_name, format='wav')
     os.remove(temp_file_path)
 
