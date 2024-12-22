@@ -17,7 +17,7 @@ DB_PASSWORD = os.environ['DB_PASSWORD']
 DB_HOST = os.environ['DB_HOST']
 DB_PORT = os.environ['DB_PORT']
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = str(Path(__file__).resolve().parent.parent)
 
 storage = MemoryStorage()
 bot = Bot(token=TOKEN)
