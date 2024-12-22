@@ -56,7 +56,7 @@ async def change_lang(message: types.Message):
     await Auth_Function(message)
     await message.answer_video(video=open( 'video/useBot.mp4', 'rb'),
                                caption="Botdan foydalanish uchun qo'llanma/Manual for using the bot\n\n\n"
-                                       "For help admin: @coder_admin_py")
+                                       "For help admin: @adkhambek_4")
 
 
 @dp.message_handler(content_types="text", chat_type=types.ChatType.PRIVATE)
@@ -259,6 +259,7 @@ async def photo_tr_other(message: types.Message):
     if file_format == 'voice':
         audio = AudioSegment.from_ogg(temp_file_path)
     elif file_format == 'audio':
+        print(temp_file_path)
         audio = AudioSegment.from_file(temp_file_path)
 
     audio_name =  f'audio_tr/{file_name}.wav'
