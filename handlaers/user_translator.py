@@ -232,7 +232,7 @@ async def photo_tr_jpg(message: types.Message):
 
 
 @dp.message_handler(content_types=[types.ContentType.VOICE, types.ContentType.AUDIO], chat_type=types.ChatType.PRIVATE)
-async def photo_tr_other(message: types.Message):
+async def audio_tr(message: types.Message):
     # web_app_info = WebAppInfo(url="https://translate.google.com/?hl=en&sl=uz&tl=en&op=translate")
     # keyboard = InlineKeyboardMarkup()
     # keyboard.add(InlineKeyboardButton(text="WEB", web_app=web_app_info))
@@ -252,8 +252,8 @@ async def photo_tr_other(message: types.Message):
         file_path = file_info.file_path
         file_format = 'audio'
         file_name = message.audio.file_unique_id
-    downloaded_file = await bot.download_file(file_path)
-    temp_file_path =  f'{file_name}.{file_format}'
+    downloaded_file = await bot.download_file("audio_tr/"+file_path)
+    temp_file_path = audio_tr + f'{file_name}.{file_format}'
     with open(temp_file_path, 'wb') as new_file:
         new_file.write(downloaded_file.read())
     if file_format == 'voice':
