@@ -20,13 +20,13 @@ def text_translate(text, user_id):
 
     sql.execute(f"""select out_lang from public.user_langs where user_id={user_id}""")
     lang_out = sql.fetchone()[0]
-    try: 
-        url = f"https://api.mymemory.translated.net/get?q={text}&langpair={lang_in}|{lang_out}"
     
-        response = requests.get(url)
-        if response.status_code == 200:
+    url = f"https://api.mymemory.translated.net/get?q={text}&langpair={lang_in}|{lang_out}"
+    
+    response = requests.get(url)
+    if response.status_code == 200:
             trText = response.json()["responseData"]["translatedText"]
-        else:
+    else:
             translator = GoogleTranslator(source=lang_in, target=lang_out)
             trText = str(translator.translate(text))
     
