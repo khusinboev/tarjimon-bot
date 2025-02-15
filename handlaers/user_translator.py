@@ -12,7 +12,7 @@ from PIL import Image
 from pydub import AudioSegment
 import speech_recognition as sr
 import platform, threading, io, asyncio, os#, pytesseract
-
+import requests
 
 def text_translate(text, user_id):
     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
@@ -20,9 +20,17 @@ def text_translate(text, user_id):
 
     sql.execute(f"""select out_lang from public.user_langs where user_id={user_id}""")
     lang_out = sql.fetchone()[0]
+    try: 
+        url = f"https://api.mymemory.translated.net/get?q={text}&langpair={lang_in}|{lang_out}"
+    
+        response = requests.get(url)
+        if response.status_code == 200:
+            trText = response.json()["responseData"]["translatedText"]
+    except :
+        translator = GoogleTranslator(source=lang_in, target=lang_out)
+        trText = str(translator.translate(text))
+    
 
-    translator = GoogleTranslator(source=lang_in, target=lang_out)
-    trText = str(translator.translate(text))
     return lang_in, lang_out, trText
 
 
