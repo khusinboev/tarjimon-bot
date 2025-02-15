@@ -26,9 +26,9 @@ def text_translate(text, user_id):
         response = requests.get(url)
         if response.status_code == 200:
             trText = response.json()["responseData"]["translatedText"]
-    except :
-        translator = GoogleTranslator(source=lang_in, target=lang_out)
-        trText = str(translator.translate(text))
+        else:
+            translator = GoogleTranslator(source=lang_in, target=lang_out)
+            trText = str(translator.translate(text))
     
 
     return lang_in, lang_out, trText
