@@ -13,8 +13,35 @@ from pydub import AudioSegment
 import speech_recognition as sr
 import platform, threading, io, asyncio, os#, pytesseract
 import requests
+import random
+from deep_translator import GoogleTranslator
 
 def text_translate(text, user_id):
+    # Foydalanuvchining tarjima tillarini olish
+    sql.execute(f"SELECT in_lang, out_lang FROM public.user_langs WHERE user_id={user_id}")
+    lang_in, lang_out = sql.fetchone()
+
+    # Tasodifiy tarjima usulini tanlash
+    method = random.choice(["mymemory", "google"])
+
+    if method == "mymemory":
+        url = f"https://api.mymemory.translated.net/get?q={text}&langpair={lang_in}|{lang_out}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            trText = response.json()["responseData"]["translatedText"]
+        else:
+            # Agar MyMemory ishlamasa, Google Translate ishlatiladi
+            method = "google"
+    
+    if method == "google":
+        translator = GoogleTranslator(source=lang_in, target=lang_out)
+        trText = translator.translate(text)
+
+    return lang_in, lang_out, trText
+
+
+def text_translate11(text, user_id):
     sql.execute(f"""select in_lang from public.user_langs where user_id={user_id}""")
     lang_in = sql.fetchone()[0]
 
